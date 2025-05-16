@@ -1,0 +1,15 @@
+RF1. Configuración de Tarifas y Duración de Reservas M1 "fee-type-service"
+
+RF2. Descuentos por Número de Personas M2 "people-discount-service"
+
+RF3. Descuentos para Clientes Frecuentes M3 "frecuency-discount-service"
+
+RF4. Tarifas para Días Especiales M4 "special-day-fee-service"
+
+RF5. Registro de Reservas
+RF6. Comprobante de Pago para Clientes M5 "rent-receipt-service"
+
+RF7. Rack Semanal de Ocupación de la Pista M6 "calendar-service"
+
+RF8. Reporte de Ingresos por Número de Vueltas o Tiempo Máximo
+RF9. Reporte de Ingresos por Número de Personas M7 "report-service"
