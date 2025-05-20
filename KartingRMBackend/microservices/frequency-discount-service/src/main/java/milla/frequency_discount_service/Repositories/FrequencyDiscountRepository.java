@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FrequencyDiscountRepository extends JpaRepository<FrequencyDiscountEntity, Integer> {
 
-    @Query(value = "SELECT * FROM frequency_discount_entity WHERE :clientFrequency BETWEEN min_frequency AND max_frequency LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT * FROM frequency_discount WHERE :clientFrequency BETWEEN min_frequency AND max_frequency LIMIT 1", nativeQuery = true)
     FrequencyDiscountEntity findByClientFrequency(@Param("clientFrequency") int clientFrequency);
 
 }

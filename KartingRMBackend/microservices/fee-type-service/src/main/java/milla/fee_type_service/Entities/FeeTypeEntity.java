@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Entity
+@Table(name = "fee_type")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
