@@ -1,0 +1,26 @@
+package milla.frequency_discount_service.Entities;
+
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class FrequencyDiscountEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int frequency_discount_id;
+    private String category;
+    private int min_frequency;
+    private int max_frequency;
+    private BigDecimal discount;
+}

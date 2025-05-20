@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>milla</groupId>
-	<artifactId>frecuency-discount-service</artifactId>
+	<artifactId>frequency-discount-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>frecuency-discount-service</name>
-	<description>frecuency-discoun-service microservice for KartingRMBackend</description>
+	<name>frequency-discount-service</name>
+	<description>frequency-discount-service microservice for KartingRMBackend</description>
 	<url/>
 	<licenses>
 		<license/>
