@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/api/feeType")
+@RequestMapping("/feeTypes")
 public class FeeTypeController {
     @Autowired
     private FeeTypeService feeTypeService;
@@ -18,12 +18,12 @@ public class FeeTypeController {
     //Getters
     @GetMapping("/all")
     public ResponseEntity<List<FeeTypeEntity>> getAll() {
-        List<FeeTypeEntity> list = feeTypeService.getAll();
-        if (list.isEmpty()) {
+        List<FeeTypeEntity> feeTypes = feeTypeService.getAll();
+        if (feeTypes.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
         else {
-            return ResponseEntity.ok(list);
+            return ResponseEntity.ok(feeTypes);
         }
     }
     @GetMapping("/{id}")
@@ -36,17 +36,16 @@ public class FeeTypeController {
             return ResponseEntity.ok(feeType);
         }
     }
-    //Save
+    //Add
     @PostMapping("/")
-    public ResponseEntity<FeeTypeEntity> add(@RequestBody FeeTypeEntity feeType) {
-        FeeTypeEntity feeTypeNew = feeTypeService.save(feeType);
-        return ResponseEntity.ok(feeTypeNew);
+    public ResponseEntity<FeeTypeEntity> save(@RequestBody FeeTypeEntity feeType) {
+        FeeTypeEntity feeTypeEntity = feeTypeService.save(feeType);
+        return ResponseEntity.ok(feeTypeEntity);
     }
     //Update
     @PutMapping("/")
     public ResponseEntity<FeeTypeEntity> update(@RequestBody FeeTypeEntity feeType) {
-        FeeTypeEntity feeTypeUpdate = feeTypeService.update(feeType);
-        return ResponseEntity.ok(feeTypeUpdate);
+        FeeTypeEntity feeTypeEntity = feeTypeService.update(feeType);
+        return ResponseEntity.ok(feeTypeEntity);
     }
-
 }
