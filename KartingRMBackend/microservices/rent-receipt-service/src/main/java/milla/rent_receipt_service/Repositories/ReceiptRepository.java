@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface ReceiptRepository extends JpaRepository<ReceiptEntity, Integer> {
     List<ReceiptEntity> getReceiptsByRent_id(int rent_id);
+    ReceiptEntity saveIncomplete(ReceiptEntity receipt);
 }

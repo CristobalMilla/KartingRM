@@ -2,6 +2,7 @@ package milla.rent_receipt_service.Services;
 
 import milla.rent_receipt_service.Entities.ReceiptEntity;
 import milla.rent_receipt_service.Model.Fee_Type;
+import milla.rent_receipt_service.Model.Frequency_Discount;
 import milla.rent_receipt_service.Repositories.ReceiptRepository;
 import milla.rent_receipt_service.Repositories.RentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class ReceiptService {
     public ReceiptEntity getReceiptById(int id){
         return receiptRepository.findById(id).orElse(null);
     }
-    //Get de la lista de receipts de una sola renta
+    //Get de la lista de receipts de una sola renta por su id
     public List<ReceiptEntity> getReceiptsByRentId(int id){
         return receiptRepository.getReceiptsByRent_id(id);
     }
@@ -66,11 +67,47 @@ public class ReceiptService {
             return rentService.getPeopleDiscountByRentId(rentId).getDiscount();
         }
     }
+    //Funcion que devuelve el descuento por frecuencia o por dia especial
+    //FALTA LOGICA PARA DIA ESPECIAL
+    public BigDecimal getSpecialDiscountPriceByReceiptId(int id){
+        ReceiptEntity receipt = receiptRepository.findById(id).orElse(null);
+        if(receipt == null){
+            return null;
+        }
+        else {
+            int rentId = receipt.getRent_id();
+            int peopleAmount = rentService.getById(rentId).getPeople_number();
+            Frequency_Discount frequencyDiscount = restTemplate.getForObject("http://frequency_discount/frequencyDiscount//getFrequencyByNumber/" + peopleAmount, Frequency_Discount.class);
+            if (frequencyDiscount == null){
+                return null;
+            }
+            else {
+                return frequencyDiscount.getDiscount();
+            }
+        }
+    }
+
+    //Funcion que crea un recibo sin completar (usando save)
+    public ReceiptEntity saveIncomplete(ReceiptEntity receiptEntity){
+        return receiptRepository.saveIncomplete(receiptEntity);
+    }
     //Funcion que calcula los distintos campos de un recibo creado
     public ReceiptEntity createFullReceipt(ReceiptEntity receipt){
-        receipt.setBase_tariff(getFeePriceByReceiptId(receipt.getReceipt_id()));
-        receipt.setSize_discount(getPeopleDiscountPriceByReceiptId(receipt.getReceipt_id()));
-
+        int receiptId = receipt.getReceipt_id();
+        BigDecimal base_tariff = getFeePriceByReceiptId(receiptId);
+        BigDecimal people_discount = getPeopleDiscountPriceByReceiptId(receiptId);
+        BigDecimal special_discount = getSpecialDiscountPriceByReceiptId(receiptId);
+        BigDecimal aggregated_price = base_tariff.multiply(people_discount).multiply(special_discount);
+        BigDecimal iva_price = aggregated_price.multiply(BigDecimal.valueOf(0.21));
+        BigDecimal final_price = aggregated_price.add(iva_price);
+       //Guardar los datos calculados
+       receipt.setBase_tariff(base_tariff);
+       receipt.setSize_discount(people_discount);
+       receipt.setSpecial_discount(special_discount);
+       receipt.setAggregated_price(aggregated_price);
+       receipt.setIva_price(iva_price);
+       receipt.setFinal_price(final_price);
+       return receiptRepository.save(receipt);
     }
 
 }
