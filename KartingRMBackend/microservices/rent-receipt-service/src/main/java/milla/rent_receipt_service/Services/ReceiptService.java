@@ -1,6 +1,7 @@
 package milla.rent_receipt_service.Services;
 
 import milla.rent_receipt_service.Entities.ReceiptEntity;
+import milla.rent_receipt_service.Entities.RentEntity;
 import milla.rent_receipt_service.Model.Fee_Type;
 import milla.rent_receipt_service.Model.Frequency_Discount;
 import milla.rent_receipt_service.Repositories.ReceiptRepository;
@@ -109,5 +110,26 @@ public class ReceiptService {
        receipt.setFinal_price(final_price);
        return receiptRepository.save(receipt);
     }
-
+    //Obtener el total_price de una renta, segun su id, y guardar la renta
+    public RentEntity saveTotalPrice(int id){
+        RentEntity rent = rentRepository.findById(id).orElse(null);
+        if (rent == null) {return null;}
+        else {
+            int rentId = rent.getRent_id();
+            List<ReceiptEntity> receiptList = receiptRepository.getReceiptsByRent_id(rentId);
+            if(receiptList == null){
+                return null;
+            }
+            else {
+                BigDecimal total_price = BigDecimal.ZERO;
+                for (ReceiptEntity receipt : receiptList) {
+                    if (receipt.getFinal_price() != null) {
+                        total_price = total_price.add(receipt.getFinal_price());
+                    }
+                }
+                rent.setTotal_price(total_price);
+                return rentRepository.save(rent);
+            }
+        }
+    }
 }

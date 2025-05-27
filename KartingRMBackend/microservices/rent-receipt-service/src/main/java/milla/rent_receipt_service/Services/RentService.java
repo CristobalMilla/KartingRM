@@ -8,7 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.sql.Date;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -60,7 +61,21 @@ public class RentService {
             return restTemplate.getForObject("http://people_discount_service/peopleDiscount/getPeopleDiscountByAmount/" + peopleAmount, People_Discount.class);
         }
     }
-
-
+    //Obtener la duracion de la renta segun su fee_type, segun el id de la renta
+    public int getDurationByRentId(int id){
+        RentEntity rent = rentRepository.findById(id).orElse(null);
+        if (rent == null) {return 0;}
+        else {
+            Fee_Type feeType = getFeeTypeByRentId(rent.getFee_type_id());
+            if (feeType == null) {return 0;}
+            else {
+                return feeType.getDuration();
+            }
+        }
+    }
+    //Obtener todas las rentas entre 2 fechas
+    public List<RentEntity> getRentsBetweenDates(Date startDate, Date endDate) {
+        return rentRepository.findRentsBetweenDates(startDate, endDate);
+    }
 
 }
