@@ -5,25 +5,21 @@ import milla.rent_receipt_service.Entities.RentEntity;
 import milla.rent_receipt_service.Model.Fee_Type;
 import milla.rent_receipt_service.Model.Frequency_Discount;
 import milla.rent_receipt_service.Repositories.ReceiptRepository;
-import milla.rent_receipt_service.Repositories.RentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-@Repository
+@Service
 public class ReceiptService {
     @Autowired
-    ReceiptRepository receiptRepository;
+    private ReceiptRepository receiptRepository;
     @Autowired
-    RentService rentService;
-
+    private RentService rentService;
     @Autowired
-    RestTemplate restTemplate;
-    @Autowired
-    private RentRepository rentRepository;
+    private RestTemplate restTemplate;
 
     //Getters
     public List<ReceiptEntity> getAll(){
@@ -78,7 +74,7 @@ public class ReceiptService {
         else {
             int rentId = receipt.getRent_id();
             int peopleAmount = rentService.getById(rentId).getPeople_number();
-            Frequency_Discount frequencyDiscount = restTemplate.getForObject("http://frequency_discount/frequencyDiscount//getFrequencyByNumber/" + peopleAmount, Frequency_Discount.class);
+            Frequency_Discount frequencyDiscount = restTemplate.getForObject("http://frequency_discount/frequencyDiscount/getFrequencyByNumber/" + peopleAmount, Frequency_Discount.class);
             if (frequencyDiscount == null){
                 return null;
             }
@@ -112,7 +108,7 @@ public class ReceiptService {
     }
     //Obtener el total_price de una renta, segun su id, y guardar la renta
     public RentEntity saveTotalPrice(int id){
-        RentEntity rent = rentRepository.findById(id).orElse(null);
+        RentEntity rent = rentService.getById(id);
         if (rent == null) {return null;}
         else {
             int rentId = rent.getRent_id();
@@ -128,7 +124,7 @@ public class ReceiptService {
                     }
                 }
                 rent.setTotal_price(total_price);
-                return rentRepository.save(rent);
+                return rentService.save(rent);
             }
         }
     }
