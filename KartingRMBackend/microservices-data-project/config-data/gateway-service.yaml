@@ -1,0 +1,47 @@
+server:
+  port: 8080
+  
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      default-zone: http://localhost:8761/eureka
+  instance:
+    hostname: localhost
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: calendar-service
+          uri: lb://calendar-service
+          predicates:
+            - Path=/calendar/**
+        - id: fee-type-service
+          uri: lb://fee-type-service
+          predicates:
+            - Path=/feeType/**
+        - id: frequency-discount-service
+          uri: lb://frequency-discount-service
+          predicates:
+            - Path=/frequencyDiscount/**
+        - id: people-discount-service
+          uri: lb://people-discount-service
+          predicates:
+            - Path=/peopleDiscount/**
+        - id: rent-receipt-service
+          uri: lb://rent-receipt-service
+          predicates:
+            - Path=/rent/**, /receipt/**
+        - id: report-service
+          uri: lb://report-service
+          predicates:
+            - Path=/report/**
+        - id: special-day-fee-service
+          uri: lb://special-day-fee-service
+          predicates:
+            - Path=/specialDay/**

@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -37,7 +35,7 @@ public class CalendarService {
 
             // Fetch duration in minutes for the current rent
             Integer duration = restTemplate.getForObject(
-                    "http://rent_service/getRentDurationById/" + rent.getRent_id(),
+                    "http://rent_service/rent/getRentDurationById/" + rent.getRent_id(),
                     Integer.class
             );
             if (duration == null) {
