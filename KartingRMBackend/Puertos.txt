@@ -1,2 +1,2 @@
-Eureka: 8081
+Eureka: 8761
 gateway: 8081
