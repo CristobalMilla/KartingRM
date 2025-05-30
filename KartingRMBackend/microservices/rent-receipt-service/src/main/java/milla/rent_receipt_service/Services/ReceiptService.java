@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -65,7 +66,6 @@ public class ReceiptService {
         }
     }
     //Funcion que devuelve el descuento por frecuencia o por dia especial
-    //FALTA LOGICA PARA DIA ESPECIAL
     public BigDecimal getSpecialDiscountPriceByReceiptId(int id){
         ReceiptEntity receipt = receiptRepository.findById(id).orElse(null);
         if(receipt == null){
@@ -73,14 +73,20 @@ public class ReceiptService {
         }
         else {
             int rentId = receipt.getRent_id();
-            int peopleAmount = rentService.getById(rentId).getPeople_number();
+            RentEntity rent = rentService.getById(rentId);
+            int peopleAmount = rent.getPeople_number();
             Frequency_Discount frequencyDiscount = restTemplate.getForObject("http://frequency_discount/frequencyDiscount/getFrequencyByNumber/" + peopleAmount, Frequency_Discount.class);
+            BigDecimal f_discount;
             if (frequencyDiscount == null){
-                return null;
+                f_discount = BigDecimal.ONE;
             }
             else {
-                return frequencyDiscount.getDiscount();
+                f_discount = frequencyDiscount.getDiscount();
             }
+            LocalDate currentDate = LocalDate.now();
+            BigDecimal b_discount = restTemplate.getForObject("http://special_day_fee/specialDay/birthday/discount/" + rent.getMain_client(), BigDecimal.class);
+            BigDecimal h_discount = restTemplate.getForObject("http://special_day_fee/specialDay/holiday/discount/" + currentDate, BigDecimal.class);
+            return f_discount.min(h_discount).min(b_discount);
         }
     }
 

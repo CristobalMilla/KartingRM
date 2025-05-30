@@ -1,1 +1,2 @@
 Eureka: 8081
+gateway: 8081
