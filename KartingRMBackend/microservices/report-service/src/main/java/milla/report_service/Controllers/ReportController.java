@@ -1,7 +1,7 @@
-package milla.report_service.Config.Controllers;
+package milla.report_service.Controllers;
 
-import milla.report_service.Config.Services.FeeTypeReportService;
-import milla.report_service.Config.Services.PeopleDiscountReportService;
+import milla.report_service.Services.FeeTypeReportService;
+import milla.report_service.Services.PeopleDiscountReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

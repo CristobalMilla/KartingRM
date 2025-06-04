@@ -1,4 +1,4 @@
-package milla.report_service.Config.Model;
+package milla.report_service.Model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

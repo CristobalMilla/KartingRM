@@ -5,13 +5,12 @@ import milla.people_discount_service.Entities.PeopleDiscountEntity;
 import milla.people_discount_service.Services.PeopleDiscountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/peopleDiscount")
 public class PeopleDiscountController {
     @Autowired
