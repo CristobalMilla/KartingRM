@@ -1,2 +1,4 @@
 Eureka: 8761
-gateway: 8081
+server: 8081
+Gateway:8082
+Base de datos: KartingRM/8080
