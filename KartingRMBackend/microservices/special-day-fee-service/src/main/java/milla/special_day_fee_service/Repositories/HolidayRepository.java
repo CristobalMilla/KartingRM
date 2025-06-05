@@ -12,7 +12,7 @@ import java.time.LocalDate;
 public interface HolidayRepository extends JpaRepository<HolidayEntity, Integer> {
     HolidayEntity findByDate(LocalDate date);
     @Query("SELECT CASE WHEN COUNT(h) > 0 THEN true ELSE false END " +
-            "FROM Holiday h WHERE MONTH(h.date) = :month AND DAY(h.date) = :day")
+            "FROM HolidayEntity h WHERE MONTH(h.date) = :month AND DAY(h.date) = :day")
     boolean existsByMonthAndDay(@Param("month") int month, @Param("day") int day);
 
 }

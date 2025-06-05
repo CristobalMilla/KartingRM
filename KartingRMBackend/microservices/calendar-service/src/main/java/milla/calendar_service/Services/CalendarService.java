@@ -44,14 +44,14 @@ public class CalendarService {
             }
 
             // Calculate end time
-            Date start = rent.getRent_date(); // Assuming rent_date includes time
+            Date start = rent.getRentDate(); // Assuming rent_date includes time
             Date end = new Date(start.getTime() + duration * 60 * 1000L); // Add duration in milliseconds
 
             // Set event properties
             event.setTitle("Rent: " + rent.getRent_code());
             event.setStart(start);
             event.setEnd(end);
-            event.setClient_name(rent.getMain_client());
+            event.setClient_name(rent.getMainClient());
 
             // Add to events list
             events.add(event);

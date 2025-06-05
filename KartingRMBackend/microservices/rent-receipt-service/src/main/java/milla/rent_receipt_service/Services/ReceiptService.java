@@ -31,7 +31,7 @@ public class ReceiptService {
     }
     //Get de la lista de receipts de una sola renta por su id
     public List<ReceiptEntity> getReceiptsByRentId(int id){
-        return receiptRepository.getReceiptsByRent_id(id);
+        return receiptRepository.getReceiptsByRentId(id);
     }
     //Save
     public ReceiptEntity save(ReceiptEntity receiptEntity){
@@ -49,7 +49,7 @@ public class ReceiptService {
             return null;
         }
         else {
-            int rentId = receipt.getRent_id();
+            int rentId = receipt.getRentId();
             Fee_Type feeType = rentService.getFeeTypeByRentId(rentId);
             return feeType.getPrice();
         }
@@ -61,7 +61,7 @@ public class ReceiptService {
             return null;
         }
         else {
-            int rentId = receipt.getRent_id();
+            int rentId = receipt.getRentId();
             return rentService.getPeopleDiscountByRentId(rentId).getDiscount();
         }
     }
@@ -72,7 +72,7 @@ public class ReceiptService {
             return null;
         }
         else {
-            int rentId = receipt.getRent_id();
+            int rentId = receipt.getRentId();
             RentEntity rent = rentService.getById(rentId);
             int peopleAmount = rent.getPeople_number();
             Frequency_Discount frequencyDiscount = restTemplate.getForObject("http://frequency_discount/frequencyDiscount/getFrequencyByNumber/" + peopleAmount, Frequency_Discount.class);
@@ -84,7 +84,7 @@ public class ReceiptService {
                 f_discount = frequencyDiscount.getDiscount();
             }
             LocalDate currentDate = LocalDate.now();
-            BigDecimal b_discount = restTemplate.getForObject("http://special_day_fee/specialDay/birthday/discount/" + rent.getMain_client(), BigDecimal.class);
+            BigDecimal b_discount = restTemplate.getForObject("http://special_day_fee/specialDay/birthday/discount/" + rent.getMainClient(), BigDecimal.class);
             BigDecimal h_discount = restTemplate.getForObject("http://special_day_fee/specialDay/holiday/discount/" + currentDate, BigDecimal.class);
             return f_discount.min(h_discount).min(b_discount);
         }
@@ -92,7 +92,7 @@ public class ReceiptService {
 
     //Funcion que crea un recibo sin completar (usando save)
     public ReceiptEntity saveIncomplete(ReceiptEntity receiptEntity){
-        return receiptRepository.saveIncomplete(receiptEntity);
+        return receiptRepository.save(receiptEntity);
     }
     //Funcion que calcula los distintos campos de un recibo creado
     public ReceiptEntity createFullReceipt(ReceiptEntity receipt){
@@ -118,7 +118,7 @@ public class ReceiptService {
         if (rent == null) {return null;}
         else {
             int rentId = rent.getRent_id();
-            List<ReceiptEntity> receiptList = receiptRepository.getReceiptsByRent_id(rentId);
+            List<ReceiptEntity> receiptList = receiptRepository.getReceiptsByRentId(rentId);
             if(receiptList == null){
                 return null;
             }

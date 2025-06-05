@@ -94,7 +94,7 @@ public class FeeTypeReportService {
             row.put("Total", rowTotal);
             report.add(row);
         }
-        //Finalmente, añadir la fina de totales por mes, y total final
+        //Finalmente, añadir la ultima fila de totales por mes, y total final
         // Add final row for month totals
         Map<String, Object> finalRow = calculateFinalRow(report, months);
         report.add(finalRow);

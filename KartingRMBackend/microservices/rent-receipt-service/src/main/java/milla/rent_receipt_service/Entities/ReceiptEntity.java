@@ -17,7 +17,8 @@ public class ReceiptEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int receipt_id;
-    private int rent_id;
+    @Column(name = "rent_id")
+    private int rentId;
     private String sub_client;
     //Tarifa base aplicada según el número de vueltas/tiempo máximo, o día especial (fines de semana o feriados).
     private BigDecimal base_tariff;
@@ -34,7 +35,7 @@ public class ReceiptEntity {
 
     public ReceiptEntity(int receipt_id, int rent_id, String sub_client) {
         this.receipt_id = receipt_id;
-        this.rent_id = rent_id;
+        this.rentId = rent_id;
         this.sub_client = sub_client;
     }
 }

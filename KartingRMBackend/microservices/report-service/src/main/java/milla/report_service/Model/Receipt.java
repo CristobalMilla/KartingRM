@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class Receipt {
     private int receipt_id;
-    private int rent_id;
+    private int rentId;
     private String sub_client;
     //Tarifa base aplicada según el número de vueltas/tiempo máximo, o día especial (fines de semana o feriados).
     private BigDecimal base_tariff;

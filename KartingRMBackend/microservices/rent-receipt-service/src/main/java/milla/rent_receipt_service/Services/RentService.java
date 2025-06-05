@@ -33,11 +33,11 @@ public class RentService {
     }
     //Get la lista de rentas de un solo cliente
     public List<RentEntity> getRentsByClientName(String clientName){
-        return rentRepository.findByMain_client(clientName);
+        return rentRepository.findByMainClient(clientName);
     }
     //Get la lista de rentas de una sola fecha
     public List<RentEntity> getRentsByRentDate(LocalDate rentDate){
-        return rentRepository.findByRent_date(rentDate);
+        return rentRepository.findByRentDate(rentDate);
     }
     //Save
     public RentEntity save(RentEntity rent){
@@ -91,7 +91,7 @@ public class RentService {
         LocalDate endDate = yearMonth.atEndOfMonth(); // Last day of the month
 
         // Fetch rents for the month
-        List<RentEntity> rents = rentRepository.findByRent_dateBetween(
+        List<RentEntity> rents = rentRepository.findByRentDateBetween(
                 startDate,
                 endDate
         );

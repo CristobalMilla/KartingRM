@@ -13,10 +13,10 @@ import java.util.List;
 @Repository
 public interface RentRepository extends JpaRepository<RentEntity, Integer> {
 
-    List<RentEntity> findByMain_client(String mainClient);
-    List<RentEntity> findByRent_date(LocalDate date);
-    @Query("SELECT r FROM RentEntity r WHERE r.rent_date BETWEEN :startDate AND :endDate")
+    List<RentEntity> findByMainClient(String mainClient);
+    List<RentEntity> findByRentDate(LocalDate date);
+    @Query("SELECT r FROM RentEntity r WHERE r.rentDate BETWEEN :startDate AND :endDate")
     List<RentEntity> findRentsBetweenDates(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
     // Fetch rents between two dates
-    List<RentEntity> findByRent_dateBetween(LocalDate startDate, LocalDate endDate);
+    List<RentEntity> findByRentDateBetween(LocalDate startDate, LocalDate endDate);
 }

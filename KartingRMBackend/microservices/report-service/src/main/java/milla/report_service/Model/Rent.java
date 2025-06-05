@@ -14,10 +14,10 @@ import java.util.Date;
 public class Rent {
     private int rent_id;
     private String rent_code;
-    private Date rent_date;
+    private Date rentDate;
     private LocalTime rent_time;
     private int fee_type_id;
     private int people_number;
-    private String main_client;
+    private String mainClient;
     private BigDecimal total_price;
 }
