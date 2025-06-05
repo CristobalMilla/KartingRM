@@ -1,6 +1,8 @@
 package milla.rent_receipt_service.Controllers;
 
+import milla.rent_receipt_service.DTO.RentRequestDTO;
 import milla.rent_receipt_service.Entities.ReceiptEntity;
+import milla.rent_receipt_service.Entities.RentEntity;
 import milla.rent_receipt_service.Services.ReceiptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -72,29 +74,11 @@ public class ReceiptController {
         }
         return ResponseEntity.ok(peopleDiscountPrice);
     }
-    //Funcion que devuelve el descuento por frecuencia o por dia especial
-    //FALTA LOGICA PARA DIA ESPECIAL
-    @GetMapping("/specialDiscountPriceByReceiptId/{id}")
-    public ResponseEntity<BigDecimal> getSpecialDiscountPriceByReceiptId(@PathVariable("id") int receiptId) {
-        BigDecimal specialDiscountPrice = receiptService.getSpecialDiscountPriceByReceiptId(receiptId);
-        if (specialDiscountPrice == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(specialDiscountPrice);
-    }
-    //Save incomplete
-    @PostMapping("/saveIncomplete")
-    public ResponseEntity<ReceiptEntity> saveIncomplete(@RequestBody ReceiptEntity receipt) {
-        ReceiptEntity savedReceipt = receiptService.saveIncomplete(receipt);
-        if (savedReceipt == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(savedReceipt);
-    }
+
     //Funcion que calcula los distintos campos de un recibo creado, y la crea en la base de datos
-    @PostMapping("/saveCalc")
-    public ResponseEntity<ReceiptEntity> saveCalc(@RequestBody ReceiptEntity receipt) {
-        ReceiptEntity savedCalcReceipt = receiptService.createFullReceipt(receipt);
+    @PostMapping("/calcAndSave")
+    public ResponseEntity<RentEntity> saveCalc(@RequestBody RentRequestDTO request) {
+        RentEntity savedCalcReceipt = receiptService.saveRentWithReceipts(request.getRent(), request.getSubClients());
         if (savedCalcReceipt == null) {
             return ResponseEntity.badRequest().build();
         }

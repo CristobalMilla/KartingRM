@@ -108,10 +108,11 @@ public class RentService {
     }
     //Booleano que checkea si un dia es festivo, se puede customizar
     private boolean isHoliday(LocalDate date) {
-        // Replace with your holiday logic
-        // Example: List of holidays or external service check
+        //Se aplicara el descuento a traves de ReceiptService, por lo que este metodo por si no es necesario
         return false;
     }
+
+    //Funciones para calendar
     //Funcion que genera slots de tiempo para un dia, con una hora de apertura, cierre, y tiempo de intervalo
     private List<LocalTime> generateTimeSlots(LocalTime start, LocalTime end, int intervalMinutes) {
         List<LocalTime> slots = new ArrayList<>();

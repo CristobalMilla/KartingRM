@@ -1,5 +1,6 @@
 package milla.rent_receipt_service.Services;
 
+import jakarta.transaction.Transactional;
 import milla.rent_receipt_service.Entities.ReceiptEntity;
 import milla.rent_receipt_service.Entities.RentEntity;
 import milla.rent_receipt_service.Model.Fee_Type;
@@ -65,73 +66,128 @@ public class ReceiptService {
             return rentService.getPeopleDiscountByRentId(rentId).getDiscount();
         }
     }
-    //Funcion que devuelve el descuento por frecuencia o por dia especial
-    public BigDecimal getSpecialDiscountPriceByReceiptId(int id){
-        ReceiptEntity receipt = receiptRepository.findById(id).orElse(null);
-        if(receipt == null){
-            return null;
+
+    //Seccion para crear renta y recibo
+    //Funciones principales para crear una renta y recibos segun datos iniciales mandados por frontend
+    //Estos datos son una renta completa excepto por precio final, y una lista de sub_clientes como strings
+    //Este calculo se realiza como transaccion atomica
+
+    //Funcion que obtiene el valor del la tarifa base
+    public BigDecimal calculateBaseTariff(int rentId) {
+        return rentService.getFeeTypeByRentId(rentId).getPrice();
+    }
+    //Funcion que obtiene el descuento de gente segun renta
+    public BigDecimal calculatePeopleDiscount(int rentId) {
+        return rentService.getPeopleDiscountByRentId(rentId).getDiscount();
+    }
+    //Funcion que calcula el descuento especial
+    //Se calculan y obtienen, si existen, descuento por frecuencia, cumpleaños (Se asume del cliente principal, se puede cambiar) y por festivo
+    //Se utiliza el numero menor obtenido, osea, el mejor descuento entre los 3
+    //Se utiliza LocalDate.now(), por lo que se obtiene la fecha de hoy desde la maquina. Esto puede generar discrepancias dependiendo de desde donde se este corriendo la aplicacion
+    public BigDecimal calculateSpecialDiscount(int rentId) {
+        RentEntity rent = rentService.getById(rentId);
+        int peopleAmount = rent.getPeople_number();
+
+        // Get frequency discount
+        Frequency_Discount frequencyDiscount = restTemplate.getForObject(
+                "http://frequency_discount/frequencyDiscount/getFrequencyByNumber/" + peopleAmount,
+                Frequency_Discount.class
+        );
+        BigDecimal f_discount;
+        if (frequencyDiscount == null) {
+            f_discount = BigDecimal.ONE;
         }
         else {
-            int rentId = receipt.getRentId();
-            RentEntity rent = rentService.getById(rentId);
-            int peopleAmount = rent.getPeople_number();
-            Frequency_Discount frequencyDiscount = restTemplate.getForObject("http://frequency_discount/frequencyDiscount/getFrequencyByNumber/" + peopleAmount, Frequency_Discount.class);
-            BigDecimal f_discount;
-            if (frequencyDiscount == null){
-                f_discount = BigDecimal.ONE;
-            }
-            else {
-                f_discount = frequencyDiscount.getDiscount();
-            }
-            LocalDate currentDate = LocalDate.now();
-            BigDecimal b_discount = restTemplate.getForObject("http://special_day_fee/specialDay/birthday/discount/" + rent.getMainClient(), BigDecimal.class);
-            BigDecimal h_discount = restTemplate.getForObject("http://special_day_fee/specialDay/holiday/discount/" + currentDate, BigDecimal.class);
-            return f_discount.min(h_discount).min(b_discount);
+            f_discount = frequencyDiscount.getDiscount();
         }
-    }
 
-    //Funcion que crea un recibo sin completar (usando save)
-    public ReceiptEntity saveIncomplete(ReceiptEntity receiptEntity){
-        return receiptRepository.save(receiptEntity);
+        LocalDate currentDate = LocalDate.now();
+
+        // Check if it's the client's birthday and get birthday discount
+        BigDecimal b_discount = BigDecimal.ONE;
+        Boolean isItsBirthday = restTemplate.getForObject(
+                "http://special_day_fee/specialDay/birthday/isItBirthday?name={name}&date={date}",
+                Boolean.class, rent.getMainClient(), currentDate);
+
+        if (Boolean.TRUE.equals(isItsBirthday)) {
+            BigDecimal birthdayDiscount = restTemplate.getForObject(
+                    "http://special_day_fee/specialDay/birthday/discount?name={name}",
+                    BigDecimal.class, rent.getMainClient());
+            if (birthdayDiscount != null) {
+                b_discount = birthdayDiscount;
+            }
+        }
+
+        // Get holiday discount
+        BigDecimal h_discount = restTemplate.getForObject(
+                "http://special_day_fee/specialDay/holiday/discount?date={date}",
+                BigDecimal.class, currentDate);
+
+        if (h_discount == null) {
+            h_discount = BigDecimal.ONE;
+        }
+
+        // Return the minimum discount (maximum benefit for the client)
+        return f_discount.min(h_discount).min(b_discount);
     }
     //Funcion que calcula los distintos campos de un recibo creado
-    public ReceiptEntity createFullReceipt(ReceiptEntity receipt){
-        int receiptId = receipt.getReceipt_id();
-        BigDecimal base_tariff = getFeePriceByReceiptId(receiptId);
-        BigDecimal people_discount = getPeopleDiscountPriceByReceiptId(receiptId);
-        BigDecimal special_discount = getSpecialDiscountPriceByReceiptId(receiptId);
-        BigDecimal aggregated_price = base_tariff.multiply(people_discount).multiply(special_discount);
-        BigDecimal iva_price = aggregated_price.multiply(BigDecimal.valueOf(0.21));
-        BigDecimal final_price = aggregated_price.add(iva_price);
-       //Guardar los datos calculados
-       receipt.setBase_tariff(base_tariff);
-       receipt.setSize_discount(people_discount);
-       receipt.setSpecial_discount(special_discount);
-       receipt.setAggregated_price(aggregated_price);
-       receipt.setIva_price(iva_price);
-       receipt.setFinal_price(final_price);
-       return receiptRepository.save(receipt);
+    //Se asume que descuento por cantidad de personas y el especial son multiplicativos
+    private ReceiptEntity createFullReceipt(ReceiptEntity receipt) {
+        int rentId = receipt.getRentId();
+        //Calculo de los atributos por separados
+        BigDecimal baseTariff = calculateBaseTariff(rentId);
+        BigDecimal peopleDiscount = calculatePeopleDiscount(rentId);
+        BigDecimal specialDiscount = calculateSpecialDiscount(rentId);
+        BigDecimal aggregatedPrice = baseTariff
+                .multiply(peopleDiscount)
+                .multiply(specialDiscount);
+        BigDecimal ivaPrice = aggregatedPrice.multiply(BigDecimal.valueOf(0.21));
+        BigDecimal finalPrice = aggregatedPrice.add(ivaPrice);
+        //Set de los atributos calculados
+        receipt.setBase_tariff(baseTariff);
+        receipt.setSize_discount(peopleDiscount);
+        receipt.setSpecial_discount(specialDiscount);
+        receipt.setAggregated_price(aggregatedPrice);
+        receipt.setIva_price(ivaPrice);
+        receipt.setFinal_price(finalPrice);
+        //Return
+        return receiptRepository.save(receipt);
     }
-    //Obtener el total_price de una renta, segun su id, y guardar la renta
-    public RentEntity saveTotalPrice(int id){
-        RentEntity rent = rentService.getById(id);
-        if (rent == null) {return null;}
-        else {
-            int rentId = rent.getRent_id();
-            List<ReceiptEntity> receiptList = receiptRepository.getReceiptsByRentId(rentId);
-            if(receiptList == null){
-                return null;
-            }
-            else {
-                BigDecimal total_price = BigDecimal.ZERO;
-                for (ReceiptEntity receipt : receiptList) {
-                    if (receipt.getFinal_price() != null) {
-                        total_price = total_price.add(receipt.getFinal_price());
-                    }
-                }
-                rent.setTotal_price(total_price);
-                return rentService.save(rent);
-            }
+    //Funcion principal que, con una renta incompleta (sin precio final) y lista de clientes
+    //Guarda, transaccional y atomicamente, una renta con sus respectivos recibos
+    //Al ser transaccional y con muchos calculos, es posible la perdida de datos, tener en cuenta
+    @Transactional
+    public RentEntity saveRentWithReceipts(RentEntity rent, List<String> subClients) {
+        // Valida datos de renta
+        validateRentData(rent);
+        // Guarda la renta incompleta
+        RentEntity savedRent = rentService.save(rent);
+        // Genera recibos para cada sub cliente y los guarda en la base de datos
+        List<ReceiptEntity> receiptList = subClients.stream()
+                .map(subClient -> {
+                    //Para cada recibo, se crea uno vacio, se setea el id de renta, se setea el subcliente
+                    //Y se calcula y guarda el recibo con estos valores
+                    ReceiptEntity receipt = new ReceiptEntity();
+                    receipt.setRentId(savedRent.getRent_id());
+                    receipt.setSub_client(subClient);
+                    return createFullReceipt(receipt); // Calculate and save receipt
+                })
+                .toList();
+        //Calcula el precio total de la renta, segun la lista de recibos
+        BigDecimal totalPrice = receiptList.stream()
+                .map(ReceiptEntity::getFinal_price)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        savedRent.setTotal_price(totalPrice);
+        //Se actualiza la renta con el precio total calculado
+        return rentService.update(savedRent);
+    }
+    //Validar datos validos de renta, modificables a gusto
+    private void validateRentData(RentEntity rent) {
+        if (rent.getPeople_number() < 1 || rent.getPeople_number() > 15) {
+            throw new IllegalArgumentException("People number must be between 1 and 15");
+        }
+        if (rent.getFee_type_id() == 0 || rent.getMainClient() == null) {
+            throw new IllegalArgumentException("Mandatory fields are missing");
         }
     }
 }

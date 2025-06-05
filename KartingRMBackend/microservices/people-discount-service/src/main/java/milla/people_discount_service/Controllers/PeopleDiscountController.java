@@ -61,8 +61,8 @@ public class PeopleDiscountController {
         }
     }
     //Funcion igual a la anterior, pero que devuelve el descuento
-    @GetMapping("/getDiscountByAmount")
-    public ResponseEntity<BigDecimal> findDiscountByAmount(@RequestParam int peopleAmount) {
+    @GetMapping("/getDiscountByAmount/{peopleAmount}")
+    public ResponseEntity<BigDecimal> findDiscountByAmount(@PathVariable int peopleAmount) {
         PeopleDiscountEntity peopleDiscount = peopleDiscountService.findByPeopleAmount(peopleAmount);
         if (peopleDiscount == null) {
             return ResponseEntity.notFound().build();

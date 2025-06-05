@@ -1,0 +1,23 @@
+CREATE TABLE birthday (
+    birthday_id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    date DATE NOT NULL,
+    discount NUMERIC(10, 2) NOT NULL
+);
+INSERT INTO birthday (name, date, discount)
+VALUES 
+    ('Juan Ejemplo', '1994-03-12', 0.9),
+    ('Margarita Ejemplo', '2001-01-30', 0.9),
+    ('Cristobal Milla', '1995-10-19', 0.9);
+CREATE TABLE holiday (
+    holiday_id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    date DATE NOT NULL,
+    discount NUMERIC(10, 2) NOT NULL
+);
+INSERT INTO holiday (name, date, discount)
+VALUES 
+    ('Navidad', '0000-12-25', 0.9),
+    ('New Year', '0000-01-01', 0.9),
+    ('Halloween', '0000-10-31', 0.9),
+    ('Independencia de Chile', '0000-11-18', 0.9);

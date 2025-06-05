@@ -1,0 +1,24 @@
+CREATE TABLE rent (
+    rent_id SERIAL PRIMARY KEY,
+    rent_code VARCHAR(255) NOT NULL,
+    rent_date DATE NOT NULL,
+    rent_time TIME NOT NULL,
+    fee_type_id INT NOT NULL,
+    people_number INT NOT NULL CHECK (people_number >= 1 AND people_number <= 15),
+    main_client VARCHAR(255) NOT NULL,
+    total_price DECIMAL(10, 2)
+);
+
+CREATE TABLE receipt (
+    receipt_id SERIAL PRIMARY KEY,
+    rent_id INT NOT NULL,
+    sub_client VARCHAR(255) NOT NULL,
+    base_tariff DECIMAL(10, 2),
+    size_discount DECIMAL(10, 2),
+    special_discount DECIMAL(10, 2),
+    aggregated_price DECIMAL(10, 2),
+    iva_price DECIMAL(10, 2),
+    final_price DECIMAL(10, 2)
+);
+
+

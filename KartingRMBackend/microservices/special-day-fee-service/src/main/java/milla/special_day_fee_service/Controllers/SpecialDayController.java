@@ -74,33 +74,37 @@ public class SpecialDayController {
     }
     //Get date from name
     @GetMapping("/birthday/name")
-    public ResponseEntity<LocalDate> getBirthdayDateByName(@RequestBody String name){
+    public ResponseEntity<LocalDate> getBirthdayDateByName(@RequestParam String name){
         LocalDate date = specialDayService.findBirthdayDateByName(name);
         if(date == null){
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(date);
     }
+
     //Boolean of its birthday
-    @PostMapping("/birthday/isItBirthday")
-    public ResponseEntity<Boolean> isItsBirthday(@RequestBody String name, @RequestBody LocalDate date){
+    @GetMapping("/birthday/isItBirthday")
+    public ResponseEntity<Boolean> isItsBirthday(@RequestParam String name, @RequestParam LocalDate date){
         boolean isItsBirthday = specialDayService.isItsBirthday(name, date);
         return ResponseEntity.ok(isItsBirthday);
     }
+
     //Is it holiday
-    @PostMapping("/holiday/isItHoliday")
-    public ResponseEntity<Boolean> isItHoliday(@RequestBody LocalDate date){
+    @GetMapping("/holiday/isItHoliday")
+    public ResponseEntity<Boolean> isItHoliday(@RequestParam LocalDate date){
         boolean isItHoliday = specialDayService.isItHoliday(date);
         return ResponseEntity.ok(isItHoliday);
     }
+
     //Get discount
     @GetMapping("/birthday/discount")
-    public ResponseEntity<BigDecimal> getBirthdayDiscountByName(@RequestBody String name){
+    public ResponseEntity<BigDecimal> getBirthdayDiscountByName(@RequestParam String name){
         BigDecimal discount = specialDayService.findBirthdayDiscountByName(name);
         return ResponseEntity.ok(discount);
     }
+
     @GetMapping("/holiday/discount")
-    public ResponseEntity<BigDecimal> getHolidayDiscountByDate(@RequestBody LocalDate date){
+    public ResponseEntity<BigDecimal> getHolidayDiscountByDate(@RequestParam LocalDate date){
         BigDecimal discount = specialDayService.findHolidayDiscountByDate(date);
         return ResponseEntity.ok(discount);
     }
