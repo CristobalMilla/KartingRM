@@ -1,0 +1,14 @@
+fee-type-service = KartingRMFeeType 
+	fee_type TABLE
+frequency-discount-service = KartingRMFrequency
+	frequency_discount TABLE
+people-discount-service = KartingRMPeople
+	people_discount TABLE
+special-day-fee-service = KartingRMSpecialDay
+	birthday TABLE
+	holiday TABLE
+rent-receipt-service = KartingRMRentReceipt
+	rent TABLE
+	receipt TABLE
+report-service SIN BASE DE DATOS
+calendar-service SIN BASE DE DATOS

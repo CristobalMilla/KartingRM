@@ -11,7 +11,7 @@ eureka:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/KartingRM #Nombre de la base de datos
+    url: jdbc:postgresql://localhost:5432/KartingRMFeeType #Nombre de la base de datos
     username: postgres
     password: postgre 
     driver-class-name: org.postgresql.Driver
