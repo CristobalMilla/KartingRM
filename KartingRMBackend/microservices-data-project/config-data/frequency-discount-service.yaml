@@ -8,3 +8,15 @@ eureka:
       default-zone: http://localhost:8761/eureka
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/KartingRM #Nombre de la base de datos
+    username: postgres
+    password: postgre 
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+  application:
+    name: frequency-discount-service
