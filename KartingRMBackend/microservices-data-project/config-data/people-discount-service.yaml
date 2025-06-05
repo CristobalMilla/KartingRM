@@ -5,15 +5,15 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      default-zone: http://localhost:8761/eureka
+      default-zone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/KartingRMPeople #Nombre de la base de datos
-    username: postgres
-    password: postgre 
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${PEOPLE_DB_NAME:KartingRMPeople}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgre}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
