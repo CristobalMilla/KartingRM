@@ -1,26 +1,71 @@
-BUILD de BACKEND
-mvn clean package
-
-RED
+---RED---
 docker network create karting-network
 
-BASES DE DATOS
+---BASES DE DATOS---
+cd **\KartingRM\KartingRMDatabase
+
+-FEE-TYPE
 docker build -t fee-type-db ./databases/fee-type-db
 docker run -d --name fee-type-postgres --network karting-network -e POSTGRES_PASSWORD=postgre -e POSTGRES_USER=postgres -e POSTGRES_DB=KartingRMFeeType -p 5432:5432 fee-type-db
 
+-FREQUENCY
+docker build -t frequency-db ./databases/frequency-db
+docker run -d --name frequency-postgres --network karting-network -e POSTGRES_PASSWORD=postgre -e POSTGRES_USER=postgres -e POSTGRES_DB=KartingRMFrequency -p 5432:5432 frequency-db
 
+-PEOPLE-DISCOUNT
+docker build -t people-db ./databases/people-db
+docker run -d --name people-postgres --network karting-network -e POSTGRES_PASSWORD=postgre -e POSTGRES_USER=postgres -e POSTGRES_DB=KartingRMPeople -p 5432:5432 people-db
 
-SERVICIOS
+-SPECIAL-DAY-FEE
+docker build -t special-day-db ./databases/special-day-db
+docker run -d --name special-day-postgres --network karting-network -e POSTGRES_PASSWORD=postgre -e POSTGRES_USER=postgres -e POSTGRES_DB=KartingRMSpecialDay -p 5432:5432 special-day-db
+
+-RENT-RECEIPT
+docker build -t rent-receipt-db ./databases/rent-receipt-db
+docker run -d --name rent-receipt-postgres --network karting-network -e POSTGRES_PASSWORD=postgre -e POSTGRES_USER=postgres -e POSTGRES_DB=KartingRMRentReceipt -p 5432:5432 rent-receipt-db
+
+---SERVICIOS---
+
+-BUILD de BACKEND-
+mvn clean package
+
+-EUREKA
 docker build -t eureka-service:latest .
 docker run -p 8761:8761 eureka-service:latest
 
+-CONFIG-SERVER
 docker build -t config-server-service:latest .
 docker run -p 8081:8081 config-server-service:latest
 
+-GATEWAY
 docker build -t gateway-service:latest .
 docker run -p 8082:8082 gateway-service:latest
 
+-FEE-TYPE
 docker build -t fee-type-service:latest .
 docker run --network karting-network -e EUREKA_HOST=localhost -e EUREKA_PORT=8761 -e PORT=8083 -e DB_HOST=fee-type-postgres -e DB_PORT=5432 -e FEE_TYPE_DB_NAME=KartingRMFeeType -e DB_USER=postgres -e DB_PASSWORD=postgre -e SPRING_CLOUD_CONFIG_URI=http://localhost:8081 fee-type-service:latest
 
+-FREQUENCY-DISCOUNT
+docker build -t frequency-discount-service:latest .
+docker run --network karting-network -e EUREKA_HOST=localhost -e EUREKA_PORT=8761 -e PORT=8084 -e DB_HOST=frequency-postgres -e DB_PORT=5432 -e FEE_TYPE_DB_NAME=KartingRMFrequency -e DB_USER=postgres -e DB_PASSWORD=postgre -e SPRING_CLOUD_CONFIG_URI=http://localhost:8081 frequency-discount-service:latest
+
+-PEOPLE-DISCOUNT
+docker build -t people-discount-service:latest .
+docker run --network karting-network -e EUREKA_HOST=localhost -e EUREKA_PORT=8761 -e PORT=8085 -e DB_HOST=people-postgres -e DB_PORT=5432 -e FEE_TYPE_DB_NAME=KartingRMPeople -e DB_USER=postgres -e DB_PASSWORD=postgre -e SPRING_CLOUD_CONFIG_URI=http://localhost:8081 people-discount-service:latest
+
+-SPECIAL-DAY-FEE
+docker build -t special-day-fee-service:latest .
+docker run --network karting-network -e EUREKA_HOST=localhost -e EUREKA_PORT=8761 -e PORT=8086 -e DB_HOST=special-day-postgres -e DB_PORT=5432 -e FEE_TYPE_DB_NAME=KartingRMSpecialDay -e DB_USER=postgres -e DB_PASSWORD=postgre -e SPRING_CLOUD_CONFIG_URI=http://localhost:8081 special-day-fee-service:latest
+
+-RENT-RECEIPT
+docker build -t rent-receipt-service:latest .
+docker run --network karting-network -e EUREKA_HOST=localhost -e EUREKA_PORT=8761 -e PORT=8087 -e DB_HOST=rent-receipt-postgres -e DB_PORT=5432 -e FEE_TYPE_DB_NAME=KartingRMRentReceipt -e DB_USER=postgres -e DB_PASSWORD=postgre -e SPRING_CLOUD_CONFIG_URI=http://localhost:8081 rent-receipt-service:latest
+
+-CALENDAR
+docker build -t calendar-service:latest .
+docker run --network karting-network -e EUREKA_HOST=localhost -e EUREKA_PORT=8761 -e PORT=8088 -e SPRING_CLOUD_CONFIG_URI=http://localhost:8081 calendar-service:latest
+
+-REPORT
+docker build -t report-service:latest .
+docker run --network karting-network -e EUREKA_HOST=localhost -e EUREKA_PORT=8761 -e PORT=8089 -e SPRING_CLOUD_CONFIG_URI=http://localhost:8081 report-service:latest
 
