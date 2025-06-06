@@ -5,7 +5,7 @@ spring:
     config:
       enabled: true
       uri: ${SPRING_CLOUD_CONFIG_URI:http://localhost:8081}
-      fail-fast: false  # Changed to false to allow fallback
+      fail-fast: false  #Allow fallback
   profiles:
     active: default
   # Fallback configuration in case Config Server is not available
