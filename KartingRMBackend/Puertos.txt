@@ -1,4 +1,5 @@
 Eureka: 8761
-server: 8081
-Gateway:8082
-Base de datos: KartingRM/8080
+Config server: 8081
+Gateway: 8082
+
+FeeType: 8083

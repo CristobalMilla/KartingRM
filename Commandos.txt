@@ -1,0 +1,26 @@
+BUILD de BACKEND
+mvn clean package
+
+RED
+docker network create karting-network
+
+BASES DE DATOS
+docker build -t fee-type-db ./databases/fee-type-db
+docker run -d --name fee-type-postgres --network karting-network -e POSTGRES_PASSWORD=postgre -e POSTGRES_USER=postgres -e POSTGRES_DB=KartingRMFeeType -p 5432:5432 fee-type-db
+
+
+
+SERVICIOS
+docker build -t eureka-service:latest .
+docker run -p 8761:8761 eureka-service:latest
+
+docker build -t config-server-service:latest .
+docker run -p 8081:8081 config-server-service:latest
+
+docker build -t gateway-service:latest .
+docker run -p 8082:8082 gateway-service:latest
+
+docker build -t fee-type-service:latest .
+docker run --network karting-network -e EUREKA_HOST=localhost -e EUREKA_PORT=8761 -e PORT=8083 -e DB_HOST=fee-type-postgres -e DB_PORT=5432 -e FEE_TYPE_DB_NAME=KartingRMFeeType -e DB_USER=postgres -e DB_PASSWORD=postgre -e SPRING_CLOUD_CONFIG_URI=http://localhost:8081 fee-type-service:latest
+
+
