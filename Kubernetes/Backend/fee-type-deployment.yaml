@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fee-type-deployment
+  namespace: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fee-type
+  template:
+    metadata:
+      labels:
+        app: fee-type
+    spec:
+      containers:
+      - name: fee-type-service
+        image: mtisw/fee-type-service:latest
+        env:
+        - name: DB_HOST
+          value: "localhost"
+        - name: DB_PORT
+          value: "5432"
+        - name: FEE_TYPE_DB_NAME
+          value: "KartingRMFeeType"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: fee-type-db-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: fee-type-db-secret
+              key: password
+        ports:
+        - containerPort: 8080 #Port interno del pod
+      - name: fee-type-db
+        image: fee-type-db:latest
+        env:
+        - name: POSTGRES_DB
+          value: "KartingRMFeeType"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: fee-type-db-secret
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: fee-type-db-secret
+              key: password
+        ports:
+        - containerPort: 5432
