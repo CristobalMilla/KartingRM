@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fee-type-deployment
+  name: frequency-discount-deployment
   namespace: backend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: fee-type
+      app: frequency-discount
   template:
     metadata:
       labels:
-        app: fee-type
+        app: frequency-discount
     spec:
       containers:
-      - name: fee-type-service
-        image: cristobalmilla/fee-type-service:latest
+      - name: frequency-discount-service
+        image: cristobalmilla/frequency-discount-service:latest
         env:
         - name: EUREKA_HOST
           value: "eureka-service.backend.svc.cluster.local"
@@ -27,34 +27,34 @@ spec:
           value: "localhost"
         - name: DB_PORT
           value: "5432"
-        - name: FEE_TYPE_DB_NAME
-          value: "KartingRMFeeType"
+        - name: FREQ_DISCOUNT_DB_NAME
+          value: "KartingRMFrequency"
         - name: DB_USER
           valueFrom:
             secretKeyRef:
-              name: fee-type-db-secret
+              name: frequency-db-secret
               key: username
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: fee-type-db-secret
+              name: frequency-db-secret
               key: password
         ports:
         - containerPort: 8080
-      - name: fee-type-db
-        image: cristobalmilla/fee-type-db:latest
+      - name: frequency-discount-db
+        image: cristobalmilla/frequency-db:latest
         env:
         - name: POSTGRES_DB
-          value: "KartingRMFeeType"
+          value: "KartingRMFrequency"
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: fee-type-db-secret
+              name: frequency-db-secret
               key: username
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: fee-type-db-secret
+              name: frequency-db-secret
               key: password
         ports:
         - containerPort: 5432

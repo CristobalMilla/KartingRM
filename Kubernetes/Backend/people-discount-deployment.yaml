@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fee-type-deployment
+  name: people-discount-deployment
   namespace: backend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: fee-type
+      app: people-discount
   template:
     metadata:
       labels:
-        app: fee-type
+        app: people-discount
     spec:
       containers:
-      - name: fee-type-service
-        image: cristobalmilla/fee-type-service:latest
+      - name: people-discount-service
+        image: cristobalmilla/people-discount-service:latest
         env:
         - name: EUREKA_HOST
           value: "eureka-service.backend.svc.cluster.local"
@@ -27,34 +27,34 @@ spec:
           value: "localhost"
         - name: DB_PORT
           value: "5432"
-        - name: FEE_TYPE_DB_NAME
-          value: "KartingRMFeeType"
+        - name: PEOPLE_DB_NAME
+          value: "KartingRMPeople"
         - name: DB_USER
           valueFrom:
             secretKeyRef:
-              name: fee-type-db-secret
+              name: people-db-secret
               key: username
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: fee-type-db-secret
+              name: people-db-secret
               key: password
         ports:
         - containerPort: 8080
-      - name: fee-type-db
-        image: cristobalmilla/fee-type-db:latest
+      - name: people-discount-db
+        image: cristobalmilla/people-db:latest
         env:
         - name: POSTGRES_DB
-          value: "KartingRMFeeType"
+          value: "KartingRMPeople"
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: fee-type-db-secret
+              name: people-db-secret
               key: username
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: fee-type-db-secret
+              name: people-db-secret
               key: password
         ports:
         - containerPort: 5432

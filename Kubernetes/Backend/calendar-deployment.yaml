@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calendar-deployment
+  namespace: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: calendar
+  template:
+    metadata:
+      labels:
+        app: calendar
+    spec:
+      containers:
+      - name: calendar-service
+        image: cristobalmilla/calendar-service:latest
+        env:
+        - name: EUREKA_HOST
+          value: "eureka-service.backend.svc.cluster.local"
+        - name: EUREKA_PORT
+          value: "8761"
+        - name: CONFIG_SERVER_URI
+          value: "http://config-server.backend.svc.cluster.local:8081"
+        ports:
+        - containerPort: 8080

@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fee-type-deployment
+  name: rent-receipt-deployment
   namespace: backend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: fee-type
+      app: rent-receipt
   template:
     metadata:
       labels:
-        app: fee-type
+        app: rent-receipt
     spec:
       containers:
-      - name: fee-type-service
-        image: cristobalmilla/fee-type-service:latest
+      - name: rent-receipt-service
+        image: cristobalmilla/rent-receipt-service:latest
         env:
         - name: EUREKA_HOST
           value: "eureka-service.backend.svc.cluster.local"
@@ -27,34 +27,34 @@ spec:
           value: "localhost"
         - name: DB_PORT
           value: "5432"
-        - name: FEE_TYPE_DB_NAME
-          value: "KartingRMFeeType"
+        - name: RENT_RECEIPT_DB_NAME
+          value: "KartingRMRentReceipt"
         - name: DB_USER
           valueFrom:
             secretKeyRef:
-              name: fee-type-db-secret
+              name: rent-receipt-db-secret
               key: username
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: fee-type-db-secret
+              name: rent-receipt-db-secret
               key: password
         ports:
         - containerPort: 8080
-      - name: fee-type-db
-        image: cristobalmilla/fee-type-db:latest
+      - name: rent-receipt-db
+        image: cristobalmilla/rent-receipt-db:latest
         env:
         - name: POSTGRES_DB
-          value: "KartingRMFeeType"
+          value: "KartingRMRentReceipt"
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
-              name: fee-type-db-secret
+              name: rent-receipt-db-secret
               key: username
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: fee-type-db-secret
+              name: rent-receipt-db-secret
               key: password
         ports:
         - containerPort: 5432

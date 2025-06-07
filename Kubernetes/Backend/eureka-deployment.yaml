@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eureka-deployment
+  namespace: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eureka
+  template:
+    metadata:
+      labels:
+        app: eureka
+    spec:
+      containers:
+      - name: eureka-service
+        image: cristobalmilla/eureka-service:latest
+        ports:
+        - containerPort: 8761
+        env:
+        - name: JAVA_OPTS
+          value: "-Xms512m -Xmx1024m" # Adjust as needed for memory limits
