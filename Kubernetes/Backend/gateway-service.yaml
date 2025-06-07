@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service
+  labels:
+    app: gateway
+spec:
+  selector:
+    app: gateway
+  ports:
+    - protocol: TCP
+      port: 8082
+      targetPort: 8082
+      nodePort: 30080 #Puerto de acceso al backend
+  type: NodePort

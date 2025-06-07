@@ -18,6 +18,3 @@ ${FREQUENCY_DB_NAME:KartingRMFrequency}
 ${PEOPLE_DB_NAME:KartingRMPeople}
 ${SPECIAL_DAY_DB_NAME:KartingRMSpecialDay}
 ${RENT_RECEIPT_DB_NAME:KartingRMRentReceipt}
-
-${CALENDAR_DB_NAME:KartingRM}
-${REPORT_DB_NAME:KartingRM}

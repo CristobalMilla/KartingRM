@@ -20,4 +20,4 @@ spec:
         - containerPort: 8761
         env:
         - name: JAVA_OPTS
-          value: "-Xms512m -Xmx1024m" # Adjust as needed for memory limits
+          value: "-Xms512m -Xmx1024m" # Ajustar para limitaciones de memoria, por ahora de 512 MB a 1024MB
