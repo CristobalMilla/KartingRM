@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -105,5 +106,13 @@ public class RentController {
         }
         return ResponseEntity.ok(totalPrice);
     }
-
+    //Funcion principal que obtiene la lista de slots segun una duracion y dia dada por la solicitud de renta nueva
+    @GetMapping("/getAvailableTimeSlots")
+    public ResponseEntity<List<LocalTime>> getAvailableTimeSlots(@RequestParam LocalDate rentDate, @RequestParam int rentDuration) {
+        List<LocalTime> availableSlots = rentService.getAvailableTimeSlots(rentDate, rentDuration);
+        if (availableSlots.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(availableSlots);
+    }
 }
