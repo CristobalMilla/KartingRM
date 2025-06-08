@@ -9,4 +9,12 @@ spring:
           default-label: main
           search-paths: KartingRMBackend/microservices-data-project/config-data
   application:
-    name: config-service
+    name: config-server-service
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

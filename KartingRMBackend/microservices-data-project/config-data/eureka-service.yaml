@@ -6,3 +6,11 @@ eureka:
     register-with-eureka: false
     service-url:
       default-zone: http://${EUREKA_HOST:eureka-service}:${EUREKA_PORT:8761}/eureka/
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

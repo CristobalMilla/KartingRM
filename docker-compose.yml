@@ -1,182 +1,368 @@
+version: '3.8'
+
 services:
-  # Databases
+  # ===================
+  # DATABASES
+  # ===================
   fee-type-postgres:
     image: cristobalmilla/fee-type-db
+    container_name: fee-type-postgres
     environment:
       POSTGRES_PASSWORD: postgre
       POSTGRES_USER: postgres
       POSTGRES_DB: KartingRMFeeType
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - karting-network
 
   frequency-postgres:
     image: cristobalmilla/frequency-db
+    container_name: frequency-postgres
     environment:
       POSTGRES_PASSWORD: postgre
       POSTGRES_USER: postgres
       POSTGRES_DB: KartingRMFrequency
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - karting-network
 
   people-postgres:
     image: cristobalmilla/people-db
+    container_name: people-postgres
     environment:
       POSTGRES_PASSWORD: postgre
       POSTGRES_USER: postgres
       POSTGRES_DB: KartingRMPeople
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - karting-network
 
   special-day-postgres:
     image: cristobalmilla/special-day-db
+    container_name: special-day-postgres
     environment:
       POSTGRES_PASSWORD: postgre
       POSTGRES_USER: postgres
       POSTGRES_DB: KartingRMSpecialDay
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - karting-network
 
   rent-receipt-postgres:
     image: cristobalmilla/rent-receipt-db
+    container_name: rent-receipt-postgres
     environment:
       POSTGRES_PASSWORD: postgre
       POSTGRES_USER: postgres
       POSTGRES_DB: KartingRMRentReceipt
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - karting-network
 
-  # Eureka
-  eureka-service:
-    image: cristobalmilla/eureka-service:latest
-    ports:
-      - "8761:8761"
-    environment:
-      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
-
-  # Config Server
+  # ===================
+  # INFRASTRUCTURE SERVICES
+  # ===================
   config-server-service:
     image: cristobalmilla/config-server-service:latest
+    container_name: config-server-service
     ports:
       - "8081:8081"
     environment:
-      EUREKA_HOST: eureka-service
-      EUREKA_PORT: 8761
-    depends_on:
-      - eureka-service
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8081/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - karting-network
 
-  # Gateway
+  eureka-service:
+    image: cristobalmilla/eureka-service:latest
+    container_name: eureka-service
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    depends_on:
+      config-server-service:
+        condition: service_healthy
+    networks:
+      - karting-network
+
   gateway-service:
     image: cristobalmilla/gateway-service:latest
+    container_name: gateway-service
     ports:
       - "8082:8082"
     environment:
-      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
-      EUREKA_HOST: eureka-service
-      EUREKA_PORT: 8761
+      - SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8082/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     depends_on:
-      - eureka-service
-      - config-server-service
+      eureka-service:
+        condition: service_healthy
+      config-server-service:
+        condition: service_healthy
+    networks:
+      - karting-network
 
-  # Microservices
+  # ===================
+  # MICROSERVICES WITH DATABASES
+  # ===================
   fee-type-service:
     image: cristobalmilla/fee-type-service:latest
+    container_name: fee-type-service
     environment:
-      EUREKA_HOST: eureka-service
-      EUREKA_PORT: 8761
-      DB_HOST: fee-type-postgres
-      DB_PORT: 5432
-      DB_NAME: KartingRMFeeType
-      DB_USER: postgres
-      DB_PASSWORD: postgre
-      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - DB_HOST=fee-type-postgres
+      - DB_PORT=5432
+      - DB_NAME=KartingRMFeeType
+      - DB_USER=postgres
+      - DB_PASSWORD=postgre
+      - SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081
+      - SERVER_PORT=0
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:$${SERVER_PORT:-8080}/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
     depends_on:
-      - fee-type-postgres
-      - eureka-service
-      - config-server-service
+      fee-type-postgres:
+        condition: service_healthy
+      eureka-service:
+        condition: service_healthy
+      config-server-service:
+        condition: service_healthy
+    networks:
+      - karting-network
 
   frequency-discount-service:
     image: cristobalmilla/frequency-discount-service:latest
+    container_name: frequency-discount-service
     environment:
-      EUREKA_HOST: eureka-service
-      EUREKA_PORT: 8761
-      DB_HOST: frequency-postgres
-      DB_PORT: 5432
-      DB_NAME: KartingRMFrequency
-      DB_USER: postgres
-      DB_PASSWORD: postgre
-      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - DB_HOST=frequency-postgres
+      - DB_PORT=5432
+      - DB_NAME=KartingRMFrequency
+      - DB_USER=postgres
+      - DB_PASSWORD=postgre
+      - SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081
+      - SERVER_PORT=0
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:$${SERVER_PORT:-8080}/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
     depends_on:
-      - frequency-postgres
-      - eureka-service
-      - config-server-service
+      frequency-postgres:
+        condition: service_healthy
+      eureka-service:
+        condition: service_healthy
+      config-server-service:
+        condition: service_healthy
+    networks:
+      - karting-network
 
   people-discount-service:
     image: cristobalmilla/people-discount-service:latest
+    container_name: people-discount-service
     environment:
-      EUREKA_HOST: eureka-service
-      EUREKA_PORT: 8761
-      DB_HOST: people-postgres
-      DB_PORT: 5432
-      DB_NAME: KartingRMPeople
-      DB_USER: postgres
-      DB_PASSWORD: postgre
-      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - DB_HOST=people-postgres
+      - DB_PORT=5432
+      - DB_NAME=KartingRMPeople
+      - DB_USER=postgres
+      - DB_PASSWORD=postgre
+      - SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081
+      - SERVER_PORT=0
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:$${SERVER_PORT:-8080}/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
     depends_on:
-      - people-postgres
-      - eureka-service
-      - config-server-service
+      people-postgres:
+        condition: service_healthy
+      eureka-service:
+        condition: service_healthy
+      config-server-service:
+        condition: service_healthy
+    networks:
+      - karting-network
 
   special-day-fee-service:
     image: cristobalmilla/special-day-fee-service:latest
+    container_name: special-day-fee-service
     environment:
-      EUREKA_HOST: eureka-service
-      EUREKA_PORT: 8761
-      DB_HOST: special-day-postgres
-      DB_PORT: 5432
-      DB_NAME: KartingRMSpecialDay
-      DB_USER: postgres
-      DB_PASSWORD: postgre
-      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - DB_HOST=special-day-postgres
+      - DB_PORT=5432
+      - DB_NAME=KartingRMSpecialDay
+      - DB_USER=postgres
+      - DB_PASSWORD=postgre
+      - SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081
+      - SERVER_PORT=0
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:$${SERVER_PORT:-8080}/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
     depends_on:
-      - special-day-postgres
-      - eureka-service
-      - config-server-service
+      special-day-postgres:
+        condition: service_healthy
+      eureka-service:
+        condition: service_healthy
+      config-server-service:
+        condition: service_healthy
+    networks:
+      - karting-network
 
   rent-receipt-service:
     image: cristobalmilla/rent-receipt-service:latest
+    container_name: rent-receipt-service
     environment:
-      EUREKA_HOST: eureka-service
-      EUREKA_PORT: 8761
-      DB_HOST: rent-receipt-postgres
-      DB_PORT: 5432
-      DB_NAME: KartingRMRentReceipt
-      DB_USER: postgres
-      DB_PASSWORD: postgre
-      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - DB_HOST=rent-receipt-postgres
+      - DB_PORT=5432
+      - DB_NAME=KartingRMRentReceipt
+      - DB_USER=postgres
+      - DB_PASSWORD=postgre
+      - SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081
+      - SERVER_PORT=0
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:$${SERVER_PORT:-8080}/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
     depends_on:
-      - rent-receipt-postgres
-      - eureka-service
-      - config-server-service
+      rent-receipt-postgres:
+        condition: service_healthy
+      eureka-service:
+        condition: service_healthy
+      config-server-service:
+        condition: service_healthy
+    networks:
+      - karting-network
 
+  # ===================
+  # MICROSERVICES WITHOUT DATABASES
+  # ===================
   calendar-service:
     image: cristobalmilla/calendar-service:latest
+    container_name: calendar-service
     environment:
-      EUREKA_HOST: eureka-service
-      EUREKA_PORT: 8761
-      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081
+      - SERVER_PORT=0
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:$${SERVER_PORT:-8080}/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
     depends_on:
-      - eureka-service
-      - config-server-service
+      eureka-service:
+        condition: service_healthy
+      config-server-service:
+        condition: service_healthy
+    networks:
+      - karting-network
 
   report-service:
     image: cristobalmilla/report-service:latest
+    container_name: report-service
     environment:
-      EUREKA_HOST: eureka-service
-      EUREKA_PORT: 8761
-      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+      - SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081
+      - SERVER_PORT=0
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:$${SERVER_PORT:-8080}/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
     depends_on:
-      - eureka-service
-      - config-server-service
+      eureka-service:
+        condition: service_healthy
+      config-server-service:
+        condition: service_healthy
+    networks:
+      - karting-network
 
-  # Frontend
+  # ===================
+  # FRONTEND
+  # ===================
   kartingrm-frontend:
     image: cristobalmilla/kartingrm-frontend:latest
+    container_name: kartingrm-frontend
     ports:
       - "80:80"
+    environment:
+      - REACT_APP_API_BASE_URL=http://gateway-service:8082
     depends_on:
-      - gateway-service
+      gateway-service:
+        condition: service_healthy
+    networks:
+      - karting-network
 
 networks:
-  default:
-    external: true
-    name: karting-network
+  karting-network:
+    driver: bridge

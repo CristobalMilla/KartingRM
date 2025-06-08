@@ -8,7 +8,7 @@ eureka:
     service-url:
       default-zone: http://${EUREKA_HOST:eureka-service}:${EUREKA_PORT:8761}/eureka/
   instance:
-    hostname: localhost
+    prefer-ip-address: true  
 
 spring:
   cloud:
@@ -45,3 +45,11 @@ spring:
           uri: lb://special-day-fee-service
           predicates:
             - Path=/specialDay/**
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

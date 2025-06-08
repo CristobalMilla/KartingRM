@@ -4,13 +4,13 @@ spring:
   cloud:
     config:
       enabled: true
-      uri: ${SPRING_CLOUD_CONFIG_URI:http://localhost:8081}
-      fail-fast: false  #Allow fallback
+      uri: ${SPRING_CLOUD_CONFIG_URI:http://config-server-service:8081}
+      fail-fast: false
   profiles:
     active: default
   # Fallback configuration in case Config Server is not available
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${FEE_TYPE_DB_NAME:KartingRMFeeType}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:KartingRMFeeType}  # ← FIXED: Use DB_NAME
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgre}
     driver-class-name: org.postgresql.Driver
@@ -20,13 +20,23 @@ spring:
       ddl-auto: update
     show-sql: true
 
-# Add Eureka configuration
+# Eureka configuration
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+      defaultZone: http://${EUREKA_HOST:eureka-service}:${EUREKA_PORT:8761}/eureka/  # ← FIXED: Default to service name
   instance:
     preferIpAddress: true
 
 server:
-  port: ${PORT:8083}
+  port: ${PORT:0} # ← FIXED: Dynamic port assignment
+
+# Add actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

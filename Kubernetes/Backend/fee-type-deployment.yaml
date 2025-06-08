@@ -18,16 +18,16 @@ spec:
         image: cristobalmilla/fee-type-service:latest
         env:
         - name: EUREKA_HOST
-          value: "eureka-service.backend.svc.cluster.local"
+          value: "eureka-service"
         - name: EUREKA_PORT
           value: "8761"
-        - name: CONFIG_SERVER_URI
-          value: "http://config-server.backend.svc.cluster.local:8081"
+        - name: SPRING_CLOUD_CONFIG_URI
+          value: "http://config-server-service:8081"
         - name: DB_HOST
-          value: "localhost"
+          value: "localhost"  # Both containers in same pod
         - name: DB_PORT
           value: "5432"
-        - name: FEE_TYPE_DB_NAME
+        - name: DB_NAME
           value: "KartingRMFeeType"
         - name: DB_USER
           valueFrom:
@@ -41,6 +41,20 @@ spec:
               key: password
         ports:
         - containerPort: 8080
+        # Add readiness probe to ensure service starts after DB
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        # Add liveness probe
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 30
       - name: fee-type-db
         image: cristobalmilla/fee-type-db:latest
         env:
@@ -58,3 +72,22 @@ spec:
               key: password
         ports:
         - containerPort: 5432
+        # Add readiness probe for database
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+            - -d
+            - KartingRMFeeType
+          initialDelaySeconds: 15
+          periodSeconds: 5
+      # Add init container to ensure dependencies are ready
+      initContainers:
+      - name: wait-for-eureka
+        image: busybox:1.35
+        command: ['sh', '-c', 'until nslookup eureka-service.backend.svc.cluster.local; do echo waiting for eureka; sleep 2; done;']
+      - name: wait-for-config-server
+        image: busybox:1.35
+        command: ['sh', '-c', 'until nslookup config-server-service.backend.svc.cluster.local; do echo waiting for config-server; sleep 2; done;']

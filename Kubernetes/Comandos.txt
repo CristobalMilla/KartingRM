@@ -1,0 +1,87 @@
+minikube ip
+
+---START----
+
+minikube start --driver=docker
+minikube status
+
+cd C:\Users\crist\Documents\Proyectos\Lab2Tingeso\KartingRM
+
+---NAMESPACES---
+
+kubectl apply -f ./Kubernetes/common/backend-namespace.yaml
+kubectl apply -f ./Kubernetes/common/frontend-namespace.yaml
+
+---GETTERS---
+
+kubectl get deployments -n backend
+kubectl get deployments -n frontend
+
+kubectl get services -n backend
+kubectl get services -n frontend
+
+kubectl get pods -o wide -n backend
+kubectl get pods -o wide -n frontend
+
+kubectl get nodes -o wide -n backend
+kubectl get nodes -o wide -n frontend
+
+kubectl get secret -n backend
+kubectl get secret -n frontend
+
+---CONFIG MAP
+kubectl get configmap
+
+kubectl apply -f ./Kubernetes/common/shared-configmap.yaml
+
+---DEPLOYMENTS, SERVICES, DB-SECRET---
+--Fee-Type---
+kubectl apply -f ./Kubernetes/backend/fee-type-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/fee-type-service.yaml
+kubectl apply -f ./Kubernetes/backend/fee-type-db-secret.yaml
+--Frequency-Discount---
+kubectl apply -f ./Kubernetes/backend/frequency-discount-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/frequency-discount-service.yaml
+kubectl apply -f ./Kubernetes/backend/frequency-discount-db-secret.yaml
+--People-Discount---
+kubectl apply -f ./Kubernetes/backend/people-discount-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/people-discount-service.yaml
+kubectl apply -f ./Kubernetes/backend/people-discount-db-secret.yaml
+--Special-Day-Fee---
+kubectl apply -f ./Kubernetes/backend/special-day-fee-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/special-day-fee-service.yaml
+kubectl apply -f ./Kubernetes/backend/special-day-fee-db-secret.yaml
+--Rent-Receipt---
+kubectl apply -f ./Kubernetes/backend/rent-receipt-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/rent-receipt-service.yaml
+kubectl apply -f ./Kubernetes/backend/rent-receipt-db-secret.yaml
+--Calendar---
+kubectl apply -f ./Kubernetes/backend/calendar-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/calendar-service.yaml
+--Report---
+kubectl apply -f ./Kubernetes/backend/report-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/report-service.yaml
+--Config-Server---
+kubectl apply -f ./Kubernetes/backend/config-server-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/config-server-service.yaml
+--Eureka---
+kubectl apply -f ./Kubernetes/backend/eureka-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/eureka-service.yaml
+--Gateway---
+kubectl apply -f ./Kubernetes/backend/gateway-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/gateway-service.yaml
+
+--Frontend--
+kubectl apply -f ./Kubernetes/frontend/frontend-deployment.yaml
+kubectl apply -f ./Kubernetes/frontend/frontend-service.yaml
+
+---VERIFICAR---
+kubectl get pods -n backend
+kubectl get pods -n frontend
+kubectl get svc -n backend
+kubectl get svc -n frontend
+
+minikube ip
+
+
+

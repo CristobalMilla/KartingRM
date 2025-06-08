@@ -31,7 +31,7 @@ mvn clean package
 
 -EUREKA
 docker build -t cristobalmilla/eureka-service:latest .
-docker run -d --network karting-network --name eureka-service -p 8761:8761 cristobalmilla/eureka-service:latest
+docker run -d --network karting-network --name eureka-service -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/ -e SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081 -p 8761:8761 cristobalmilla/eureka-service:latest
 
 -CONFIG-SERVER
 docker build -t cristobalmilla/config-server-service:latest .
@@ -39,7 +39,7 @@ docker run -d --network karting-network --name config-server-service -p 8081:808
 
 -GATEWAY
 docker build -t cristobalmilla/gateway-service:latest .
-docker run -d --network karting-network --name gateway-service -p 8082:8082 cristobalmilla/gateway-service:latest
+docker run -d --network karting-network --name gateway-service -e SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081 -p 8082:8082 cristobalmilla/gateway-service:latest
 
 -FEE-TYPE
 docker build -t cristobalmilla/fee-type-service:latest .
@@ -77,19 +77,25 @@ docker run -d --network karting-network --name kartingrm-frontend -p 80:80 crist
 ---Navegador
 http://localhost/
 
-docker push cristobalmilla/fee-type-db:latest
-docker push cristobalmilla/frequency-db:latest
-docker push cristobalmilla/people-db:latest
-docker push cristobalmilla/special-day-db:latest
-docker push cristobalmilla/rent-receipt-db:latest
+# Databases
+docker push cristobalmilla/fee-type-db
+docker push cristobalmilla/frequency-db
+docker push cristobalmilla/people-db
+docker push cristobalmilla/special-day-db
+docker push cristobalmilla/rent-receipt-db
+
+# Backend services
 docker push cristobalmilla/eureka-service:latest
 docker push cristobalmilla/config-server-service:latest
 docker push cristobalmilla/gateway-service:latest
 docker push cristobalmilla/fee-type-service:latest
 docker push cristobalmilla/frequency-discount-service:latest
 docker push cristobalmilla/people-discount-service:latest
+docker push cristobalmilla/special-day-fee-service:latest
 docker push cristobalmilla/rent-receipt-service:latest
 docker push cristobalmilla/calendar-service:latest
 docker push cristobalmilla/report-service:latest
+
+# Frontend
 docker push cristobalmilla/kartingrm-frontend:latest
 
