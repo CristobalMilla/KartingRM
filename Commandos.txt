@@ -5,23 +5,23 @@ docker network create karting-network
 cd **\KartingRM\KartingRMDatabase
 
 -FEE-TYPE
-docker build -t fee-type-db ./databases/fee-type-db
+docker build -t cristobalmilla/fee-type-db ./databases/fee-type-db
 docker run -d --name fee-type-postgres --network karting-network -e POSTGRES_PASSWORD=postgre -e POSTGRES_USER=postgres -e POSTGRES_DB=KartingRMFeeType fee-type-db
 
 -FREQUENCY
-docker build -t frequency-db ./databases/frequency-db
+docker build -t cristobalmilla/frequency-db ./databases/frequency-db
 docker run -d --name frequency-postgres --network karting-network -e POSTGRES_PASSWORD=postgre -e POSTGRES_USER=postgres -e POSTGRES_DB=KartingRMFrequency frequency-db
 
 -PEOPLE-DISCOUNT
-docker build -t people-db ./databases/people-db
+docker build -t cristobalmilla/people-db ./databases/people-db
 docker run -d --name people-postgres --network karting-network -e POSTGRES_PASSWORD=postgre -e POSTGRES_USER=postgres -e POSTGRES_DB=KartingRMPeople people-db
 
 -SPECIAL-DAY-FEE
-docker build -t special-day-db ./databases/special-day-db
+docker build -t cristobalmilla/special-day-db ./databases/special-day-db
 docker run -d --name special-day-postgres --network karting-network -e POSTGRES_PASSWORD=postgre -e POSTGRES_USER=postgres -e POSTGRES_DB=KartingRMSpecialDay special-day-db
 
 -RENT-RECEIPT
-docker build -t rent-receipt-db ./databases/rent-receipt-db
+docker build -t cristobalmilla/rent-receipt-db ./databases/rent-receipt-db
 docker run -d --name rent-receipt-postgres --network karting-network -e POSTGRES_PASSWORD=postgre -e POSTGRES_USER=postgres -e POSTGRES_DB=KartingRMRentReceipt rent-receipt-db
 
 ---SERVICIOS---
@@ -30,42 +30,63 @@ docker run -d --name rent-receipt-postgres --network karting-network -e POSTGRES
 mvn clean package
 
 -EUREKA
-docker build -t eureka-service:latest .
+docker build -t cristobalmilla/eureka-service:latest .
 docker run -d --network karting-network --name eureka-service -p 8761:8761 eureka-service:latest
 
 -CONFIG-SERVER
-docker build -t config-server-service:latest .
+docker build -t cristobalmilla/config-server-service:latest .
 docker run -d --network karting-network --name config-server-service -p 8081:8081 config-server-service:latest
 
 -GATEWAY
-docker build -t gateway-service:latest .
+docker build -t cristobalmilla/gateway-service:latest .
 docker run -d --network karting-network --name gateway-service -p 8082:8082 gateway-service:latest
 
 -FEE-TYPE
-docker build -t fee-type-service:latest .
+docker build -t cristobalmilla/fee-type-service:latest .
 docker run -d --network karting-network --name fee-type-service -e EUREKA_HOST=eureka-service -e EUREKA_PORT=8761 -e DB_HOST=fee-type-postgres -e DB_PORT=5432 -e DB_NAME=KartingRMFeeType -e DB_USER=postgres -e DB_PASSWORD=postgre -e SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081 fee-type-service:latest
 
 -FREQUENCY-DISCOUNT
-docker build -t frequency-discount-service:latest .
+docker build -t cristobalmilla/frequency-discount-service:latest .
 docker run -d --network karting-network --name frequency-discount-service -e EUREKA_HOST=eureka-service -e EUREKA_PORT=8761 -e DB_HOST=frequency-postgres -e DB_PORT=5432 -e DB_NAME=KartingRMFrequency -e DB_USER=postgres -e DB_PASSWORD=postgre -e SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081 frequency-discount-service:latest
 
 -PEOPLE-DISCOUNT
-docker build -t people-discount-service:latest .
+docker build -t cristobalmilla/people-discount-service:latest .
 docker run -d --network karting-network --name people-discount-service -e EUREKA_HOST=eureka-service -e EUREKA_PORT=8761 -e DB_HOST=people-postgres -e DB_PORT=5432 -e DB_NAME=KartingRMPeople -e DB_USER=postgres -e DB_PASSWORD=postgre -e SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081 people-discount-service:latest
 
 -SPECIAL-DAY-FEE
-docker build -t special-day-fee-service:latest .
+docker build -t cristobalmilla/special-day-fee-service:latest .
 docker run -d --network karting-network --name special-day-fee-service -e EUREKA_HOST=eureka-service -e EUREKA_PORT=8761 -e DB_HOST=special-day-postgres -e DB_PORT=5432 -e DB_NAME=KartingRMSpecialDay -e DB_USER=postgres -e DB_PASSWORD=postgre -e SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081 special-day-fee-service:latest
 
 -RENT-RECEIPT
-docker build -t rent-receipt-service:latest .
+docker build -t cristobalmilla/rent-receipt-service:latest .
 docker run -d --network karting-network --name rent-receipt-service -e EUREKA_HOST=eureka-service -e EUREKA_PORT=8761 -e DB_HOST=rent-receipt-postgres -e DB_PORT=5432 -e DB_NAME=KartingRMRentReceipt -e DB_USER=postgres -e DB_PASSWORD=postgre -e SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081 rent-receipt-service:latest
 
 -CALENDAR
-docker build -t calendar-service:latest .
+docker build -t cristobalmilla/calendar-service:latest .
 docker run -d --network karting-network --name calendar-service -e EUREKA_HOST=eureka-service -e EUREKA_PORT=8761 -e SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081 calendar-service:latest
 
 -REPORT
-docker build -t report-service:latest .
+docker build -t cristobalmilla/report-service:latest .
 docker run -d --network karting-network --name report-service -e EUREKA_HOST=eureka-service -e EUREKA_PORT=8761 -e SPRING_CLOUD_CONFIG_URI=http://config-server-service:8081 report-service:latest
+
+
+---BUILD DE FRONTEND---
+docker build -t cristobalmilla/kartingrm-frontend:latest .
+docker run -d --name kartingrm-frontend -p 80:80 kartingrm-frontend
+
+docker push cristobalmilla/fee-type-db:latest
+docker push cristobalmilla/frequency-db:latest
+docker push cristobalmilla/people-db:latest
+docker push cristobalmilla/special-day-db:latest
+docker push cristobalmilla/rent-receipt-db:latest
+docker push cristobalmilla/eureka-service:latest
+docker push cristobalmilla/config-server-service:latest
+docker push cristobalmilla/gateway-service:latest
+docker push cristobalmilla/fee-type-service:latest
+docker push cristobalmilla/frequency-discount-service:latest
+docker push cristobalmilla/people-discount-service:latest
+docker push cristobalmilla/rent-receipt-service:latest
+docker push cristobalmilla/calendar-service:latest
+docker push cristobalmilla/report-service:latest
+docker push cristobalmilla/kartingrm-frontend:latest
 

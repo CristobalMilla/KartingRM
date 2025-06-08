@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  namespace: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kartingrm-frontend
+  template:
+    metadata:
+      labels:
+        app: kartingrm-frontend
+    spec:
+      containers:
+      - name: kartingrm-frontend
+        image: cristobalmilla/kartingrm-frontend:latest
+        ports:
+        - containerPort: 80
