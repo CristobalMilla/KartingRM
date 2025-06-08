@@ -17,7 +17,7 @@ CREATE TABLE holiday (
 );
 INSERT INTO holiday (name, date, discount)
 VALUES 
-    ('Navidad', '0000-12-25', 0.9),
-    ('New Year', '0000-01-01', 0.9),
-    ('Halloween', '0000-10-31', 0.9),
-    ('Independencia de Chile', '0000-11-18', 0.9);
+    ('Navidad', '0001-12-25', 0.9),
+    ('New Year', '0001-01-01', 0.9),
+    ('Halloween', '0001-10-31', 0.9),
+    ('Independencia de Chile', '0001-11-18', 0.9);

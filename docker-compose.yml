@@ -1,0 +1,182 @@
+services:
+  # Databases
+  fee-type-postgres:
+    image: cristobalmilla/fee-type-db
+    environment:
+      POSTGRES_PASSWORD: postgre
+      POSTGRES_USER: postgres
+      POSTGRES_DB: KartingRMFeeType
+
+  frequency-postgres:
+    image: cristobalmilla/frequency-db
+    environment:
+      POSTGRES_PASSWORD: postgre
+      POSTGRES_USER: postgres
+      POSTGRES_DB: KartingRMFrequency
+
+  people-postgres:
+    image: cristobalmilla/people-db
+    environment:
+      POSTGRES_PASSWORD: postgre
+      POSTGRES_USER: postgres
+      POSTGRES_DB: KartingRMPeople
+
+  special-day-postgres:
+    image: cristobalmilla/special-day-db
+    environment:
+      POSTGRES_PASSWORD: postgre
+      POSTGRES_USER: postgres
+      POSTGRES_DB: KartingRMSpecialDay
+
+  rent-receipt-postgres:
+    image: cristobalmilla/rent-receipt-db
+    environment:
+      POSTGRES_PASSWORD: postgre
+      POSTGRES_USER: postgres
+      POSTGRES_DB: KartingRMRentReceipt
+
+  # Eureka
+  eureka-service:
+    image: cristobalmilla/eureka-service:latest
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
+
+  # Config Server
+  config-server-service:
+    image: cristobalmilla/config-server-service:latest
+    ports:
+      - "8081:8081"
+    environment:
+      EUREKA_HOST: eureka-service
+      EUREKA_PORT: 8761
+    depends_on:
+      - eureka-service
+
+  # Gateway
+  gateway-service:
+    image: cristobalmilla/gateway-service:latest
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
+      EUREKA_HOST: eureka-service
+      EUREKA_PORT: 8761
+    depends_on:
+      - eureka-service
+      - config-server-service
+
+  # Microservices
+  fee-type-service:
+    image: cristobalmilla/fee-type-service:latest
+    environment:
+      EUREKA_HOST: eureka-service
+      EUREKA_PORT: 8761
+      DB_HOST: fee-type-postgres
+      DB_PORT: 5432
+      DB_NAME: KartingRMFeeType
+      DB_USER: postgres
+      DB_PASSWORD: postgre
+      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
+    depends_on:
+      - fee-type-postgres
+      - eureka-service
+      - config-server-service
+
+  frequency-discount-service:
+    image: cristobalmilla/frequency-discount-service:latest
+    environment:
+      EUREKA_HOST: eureka-service
+      EUREKA_PORT: 8761
+      DB_HOST: frequency-postgres
+      DB_PORT: 5432
+      DB_NAME: KartingRMFrequency
+      DB_USER: postgres
+      DB_PASSWORD: postgre
+      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
+    depends_on:
+      - frequency-postgres
+      - eureka-service
+      - config-server-service
+
+  people-discount-service:
+    image: cristobalmilla/people-discount-service:latest
+    environment:
+      EUREKA_HOST: eureka-service
+      EUREKA_PORT: 8761
+      DB_HOST: people-postgres
+      DB_PORT: 5432
+      DB_NAME: KartingRMPeople
+      DB_USER: postgres
+      DB_PASSWORD: postgre
+      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
+    depends_on:
+      - people-postgres
+      - eureka-service
+      - config-server-service
+
+  special-day-fee-service:
+    image: cristobalmilla/special-day-fee-service:latest
+    environment:
+      EUREKA_HOST: eureka-service
+      EUREKA_PORT: 8761
+      DB_HOST: special-day-postgres
+      DB_PORT: 5432
+      DB_NAME: KartingRMSpecialDay
+      DB_USER: postgres
+      DB_PASSWORD: postgre
+      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
+    depends_on:
+      - special-day-postgres
+      - eureka-service
+      - config-server-service
+
+  rent-receipt-service:
+    image: cristobalmilla/rent-receipt-service:latest
+    environment:
+      EUREKA_HOST: eureka-service
+      EUREKA_PORT: 8761
+      DB_HOST: rent-receipt-postgres
+      DB_PORT: 5432
+      DB_NAME: KartingRMRentReceipt
+      DB_USER: postgres
+      DB_PASSWORD: postgre
+      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
+    depends_on:
+      - rent-receipt-postgres
+      - eureka-service
+      - config-server-service
+
+  calendar-service:
+    image: cristobalmilla/calendar-service:latest
+    environment:
+      EUREKA_HOST: eureka-service
+      EUREKA_PORT: 8761
+      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
+    depends_on:
+      - eureka-service
+      - config-server-service
+
+  report-service:
+    image: cristobalmilla/report-service:latest
+    environment:
+      EUREKA_HOST: eureka-service
+      EUREKA_PORT: 8761
+      SPRING_CLOUD_CONFIG_URI: http://config-server-service:8081
+    depends_on:
+      - eureka-service
+      - config-server-service
+
+  # Frontend
+  kartingrm-frontend:
+    image: cristobalmilla/kartingrm-frontend:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - gateway-service
+
+networks:
+  default:
+    external: true
+    name: karting-network

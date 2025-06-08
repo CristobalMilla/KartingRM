@@ -15,8 +15,8 @@ FROM nginx:alpine
 # Copy built assets
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy custom nginx config if needed (optional)
-# COPY nginx.conf /etc/nginx/nginx.conf
+# Copy custom nginx config
+COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 
