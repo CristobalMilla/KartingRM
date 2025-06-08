@@ -14,7 +14,11 @@ const PeopleDiscountReport: React.FC = () => {
     setLoading(true)
     try {
       const report = await getPeopleDiscountReport(startMonth, endMonth)
-      setData(report)
+      setData(Array.isArray(report) ? report : [])
+      console.log(report)
+    } catch (err) {
+      setData([])
+      // Optionally: alert('No se pudo cargar el informe.')
     } finally {
       setLoading(false)
     }

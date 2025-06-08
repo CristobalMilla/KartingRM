@@ -20,12 +20,7 @@ public class PeopleDiscountController {
     @GetMapping("/all")
     public ResponseEntity<List<PeopleDiscountEntity>> getAllPeopleDiscount() {
         List<PeopleDiscountEntity> list = peopleDiscountService.getAll();
-        if (list.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        else {
             return ResponseEntity.ok(list);
-        }
     }
     @GetMapping("/{id}")
     public ResponseEntity<PeopleDiscountEntity> getPeopleDiscountById(@PathVariable("id") int id) {

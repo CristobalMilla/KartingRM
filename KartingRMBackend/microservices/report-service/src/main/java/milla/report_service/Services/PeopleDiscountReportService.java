@@ -51,8 +51,9 @@ public class PeopleDiscountReportService {
     }
     public List<Map<String, Object>> generatePeopleDiscountReport(String startMonth, String endMonth) {
         // Fetch all people discounts
-        People_Discount[] peopleDiscounts = restTemplate.getForObject("http://discount_service/peopleDiscounts", People_Discount[].class);
+        People_Discount[] peopleDiscounts = restTemplate.getForObject("http://PEOPLE-DISCOUNT-SERVICE/peopleDiscount/all", People_Discount[].class);
         if(peopleDiscounts == null){
+            System.out.println("No hay discount");
             return null;
         }
         // Prepare months list
@@ -71,7 +72,7 @@ public class PeopleDiscountReportService {
             // Aggregate data for each month
             for (String month : months) {
                 BigDecimal monthTotal = restTemplate.getForObject(
-                        String.format("http://rent_service/rents/totalPriceByPeopleDiscount?month=%s&peopleDiscountId=%d",
+                        String.format("http://RENT-RECEIPT-SERVICE/rent/totalPriceByPeopleDiscount?month=%s&peopleDiscountId=%d",
                                 month, discount.getPeople_discount_id()),
                         BigDecimal.class);
 

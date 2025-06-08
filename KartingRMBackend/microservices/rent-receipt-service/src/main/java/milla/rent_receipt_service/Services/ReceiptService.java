@@ -90,7 +90,7 @@ public class ReceiptService {
 
         // Get frequency discount
         Frequency_Discount frequencyDiscount = restTemplate.getForObject(
-                "http://frequency_discount/frequencyDiscount/getFrequencyByNumber/" + peopleAmount,
+                "http://FREQUENCY-DISCOUNT-SERVICE/frequencyDiscount/getFrequencyByNumber/" + peopleAmount,
                 Frequency_Discount.class
         );
         BigDecimal f_discount;
@@ -106,12 +106,12 @@ public class ReceiptService {
         // Check if it's the client's birthday and get birthday discount
         BigDecimal b_discount = BigDecimal.ONE;
         Boolean isItsBirthday = restTemplate.getForObject(
-                "http://special_day_fee/specialDay/birthday/isItBirthday?name={name}&date={date}",
+                "http://SPECIAL-DAY-FEE-SERVICE/specialDay/birthday/isItBirthday?name={name}&date={date}",
                 Boolean.class, rent.getMainClient(), currentDate);
 
         if (Boolean.TRUE.equals(isItsBirthday)) {
             BigDecimal birthdayDiscount = restTemplate.getForObject(
-                    "http://special_day_fee/specialDay/birthday/discount?name={name}",
+                    "http://SPECIAL-DAY-FEE-SERVICE/specialDay/birthday/discount?name={name}",
                     BigDecimal.class, rent.getMainClient());
             if (birthdayDiscount != null) {
                 b_discount = birthdayDiscount;
@@ -120,7 +120,7 @@ public class ReceiptService {
 
         // Get holiday discount
         BigDecimal h_discount = restTemplate.getForObject(
-                "http://special_day_fee/specialDay/holiday/discount?date={date}",
+                "http://SPECIAL-DAY-FEE-SERVICE/specialDay/holiday/discount?date={date}",
                 BigDecimal.class, currentDate);
 
         if (h_discount == null) {

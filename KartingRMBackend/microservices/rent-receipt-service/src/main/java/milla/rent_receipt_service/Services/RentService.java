@@ -53,7 +53,7 @@ public class RentService {
         if (rent == null) {return null;}
         else {
             int feeTypeId = rent.getFee_type_id();
-            return restTemplate.getForObject("http://fee_type_service/feeTypes/" + feeTypeId, Fee_Type.class);
+            return restTemplate.getForObject("http://FEE-TYPE-SERVICE/feeType/" + feeTypeId, Fee_Type.class);
         }
     }
     //Obtener el people_discount de la renta segun su id
@@ -62,7 +62,7 @@ public class RentService {
         if (rent == null) {return null;}
         else {
             int peopleAmount = rent.getPeople_number();
-            return restTemplate.getForObject("http://people_discount_service/peopleDiscount/getPeopleDiscountByAmount/" + peopleAmount, People_Discount.class);
+            return restTemplate.getForObject("http://PEOPLE-DISCOUNT-SERVICE/peopleDiscount/getPeopleDiscountByAmount/" + peopleAmount, People_Discount.class);
         }
     }
     //Obtener la duracion de la renta segun su fee_type, segun el id de la renta
@@ -98,6 +98,54 @@ public class RentService {
 
         // Calculate the total price
         return rents.stream()
+                .map(RentEntity::getTotal_price)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    public BigDecimal calculateTotalPriceForMonthByFeeTypeId(String month, int fee_type_id){
+        // Parse the month to YearMonth
+        YearMonth yearMonth = YearMonth.parse(month); // e.g., "2025-01"
+
+        // Define the start and end dates for the month
+        LocalDate startDate = yearMonth.atDay(1); // First day of the month
+        LocalDate endDate = yearMonth.atEndOfMonth(); // Last day of the month
+
+        // Fetch rents for the month
+        List<RentEntity> rents = rentRepository.findByRentDateBetween(
+                startDate,
+                endDate
+        );
+        //Filter by the fee_type_id
+        List<RentEntity> filteredRents = rents.stream()
+                .filter(rent -> rent.getFee_type_id() == fee_type_id)
+                .toList();
+        // Calculate the total price
+        return filteredRents.stream()
+                .map(RentEntity::getTotal_price)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    public BigDecimal calculateTotalPriceForMonthByPeopleDiscountId(String month, int people_discount_id){
+        // Parse the month to YearMonth
+        YearMonth yearMonth = YearMonth.parse(month); // e.g., "2025-01"
+
+        // Define the start and end dates for the month
+        LocalDate startDate = yearMonth.atDay(1); // First day of the month
+        LocalDate endDate = yearMonth.atEndOfMonth(); // Last day of the month
+
+        // Fetch rents for the month
+        List<RentEntity> rents = rentRepository.findByRentDateBetween(
+                startDate,
+                endDate
+        );
+        //Filter by the people_discount_id
+        People_Discount peopleDiscount = restTemplate.getForObject("http://PEOPLE-DISCOUNT-SERVICE/peopleDiscount/" + people_discount_id, People_Discount.class);
+        List<RentEntity> filteredRents = rents.stream()
+                .filter(rent -> {
+                    assert peopleDiscount != null;
+                    return rent.getPeople_number() >= peopleDiscount.getMin_people() && rent.getPeople_number() <= peopleDiscount.getMax_people();
+                })
+                .toList();
+        // Calculate the total price
+        return filteredRents.stream()
                 .map(RentEntity::getTotal_price)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
@@ -140,7 +188,7 @@ public class RentService {
         for (RentEntity rent : rents) {
             // Get rent duration from fee_type
             Integer duration = restTemplate.getForObject(
-                    "http://fee_type_service/getDurationById/" + rent.getFee_type_id(),
+                    "http://FEE-TYPE-SERVICE/getDurationById/" + rent.getFee_type_id(),
                     Integer.class
             );
             if (duration == null) continue; // Skip if no duration found

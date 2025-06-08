@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { getFeeTypes, getAvailableTimeSlots, createRent } from '../services/rentService'
-import type { FeeTypeEntity, CalendarEvent, RentEntity, RentRequestDTO } from '../types/entities.ts'
+import type { FeeTypeEntity, RentEntity, RentRequestDTO } from '../types/entities.ts'
 import { useNavigate } from 'react-router-dom'
 
 const MAX_PEOPLE = 15
@@ -14,7 +14,6 @@ const CreateRent: React.FC = () => {
   const [peopleNumber, setPeopleNumber] = useState(1)
   const [subClients, setSubClients] = useState<string[]>([])
   const [rentCode, setRentCode] = useState('')
-  const [rentTime, setRentTime] = useState('10:00:00') // Default time, adjust as needed
   const [availableSlots, setAvailableSlots] = useState<string[]>([])
   const [selectedSlot, setSelectedSlot] = useState('')
   const navigate = useNavigate()

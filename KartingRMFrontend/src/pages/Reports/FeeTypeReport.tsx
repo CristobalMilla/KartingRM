@@ -14,7 +14,10 @@ const FeeTypeReport: React.FC = () => {
     setLoading(true)
     try {
       const report = await getFeeTypeReport(startMonth, endMonth)
-      setData(report)
+      setData(Array.isArray(report) ? report : [])
+    } catch (err) {
+      setData([])
+      // Optionally: alert('No se pudo cargar el informe.')
     } finally {
       setLoading(false)
     }

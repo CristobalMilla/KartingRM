@@ -60,18 +60,12 @@ public class ReceiptController {
     @GetMapping("/feePriceByReceiptId/{id}")
     public ResponseEntity<BigDecimal> getFeePriceByReceiptId(@PathVariable("id") int receiptId) {
         BigDecimal feePrice = receiptService.getFeePriceByReceiptId(receiptId);
-        if (feePrice == null) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(feePrice);
     }
     //Get para obtener el people_discount price del recibo, segun su renta
     @GetMapping("/peopleDiscountPriceByReceiptId/{id}")
     public ResponseEntity<BigDecimal> getPeopleDiscountPriceByReceiptId(@PathVariable("id") int receiptId) {
         BigDecimal peopleDiscountPrice = receiptService.getPeopleDiscountPriceByReceiptId(receiptId);
-        if (peopleDiscountPrice == null) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(peopleDiscountPrice);
     }
 
@@ -79,9 +73,6 @@ public class ReceiptController {
     @PostMapping("/calcAndSave")
     public ResponseEntity<RentEntity> saveCalc(@RequestBody RentRequestDTO request) {
         RentEntity savedCalcReceipt = receiptService.saveRentWithReceipts(request.getRent(), request.getSubClients());
-        if (savedCalcReceipt == null) {
-            return ResponseEntity.badRequest().build();
-        }
         return ResponseEntity.ok(savedCalcReceipt);
     }
 

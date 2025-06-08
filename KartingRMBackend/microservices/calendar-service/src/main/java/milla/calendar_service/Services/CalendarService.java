@@ -21,7 +21,7 @@ public class CalendarService {
         String endDate = weekEndDate.toString();
 
         Rent[] rents = restTemplate.getForObject(
-                "http://rent_service/rent/getRentsBetweenDates?startDate=" + startDate + "&endDate=" + endDate,
+                "http://RENT-RECEIPT-SERVICE/rent/getRentsBetweenDates?startDate=" + startDate + "&endDate=" + endDate,
                 Rent[].class
         );
         return rents != null ? Arrays.asList(rents) : new ArrayList<>();
@@ -35,7 +35,7 @@ public class CalendarService {
 
             // Fetch duration in minutes for the current rent
             Integer duration = restTemplate.getForObject(
-                    "http://rent_service/rent/getRentDurationById/" + rent.getRent_id(),
+                    "http://RENT-RECEIPT-SERVICE/rent/getRentDurationById/" + rent.getRent_id(),
                     Integer.class
             );
             if (duration == null) {

@@ -27,11 +27,11 @@ const SpecialDayFee: React.FC = () => {
         </thead>
         <tbody>
           {holidays.map(h => (
-            <tr key={h.id}>
-              <td>{h.id}</td>
+            <tr key={h.holiday_id}>
+              <td>{h.holiday_id}</td>
               <td>{h.name}</td>
               <td>{h.date}</td>
-              <td>{h.specialFee}</td>
+              <td>{h.discount}</td>
             </tr>
           ))}
         </tbody>
@@ -48,11 +48,11 @@ const SpecialDayFee: React.FC = () => {
         </thead>
         <tbody>
           {birthdays.map(b => (
-            <tr key={b.id}>
-              <td>{b.id}</td>
-              <td>{b.clientName}</td>
+            <tr key={b.birthday_id}>
+              <td>{b.birthday_id}</td>
+              <td>{b.name}</td>
               <td>{b.date}</td>
-              <td>{b.specialFee}</td>
+              <td>{b.discount}</td>
             </tr>
           ))}
         </tbody>

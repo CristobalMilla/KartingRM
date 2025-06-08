@@ -21,15 +21,17 @@ const FrequencyDiscount: React.FC = () => {
             <th>Descripción</th>
             <th>Descuento</th>
             <th>Frecuencia Mínima</th>
+            <th>Frecuencia Máxima</th>
           </tr>
         </thead>
         <tbody>
           {discounts.map(d => (
-            <tr key={d.id}>
-              <td>{d.id}</td>
-              <td>{d.description}</td>
+            <tr key={d.frequency_discount_id}>
+              <td>{d.frequency_discount_id}</td>
+              <td>{d.category}</td>
               <td>{d.discount}</td>
-              <td>{d.minFrequency}</td>
+              <td>{d.min_frequency}</td>
+              <td>{d.max_frequency}</td>
             </tr>
           ))}
         </tbody>

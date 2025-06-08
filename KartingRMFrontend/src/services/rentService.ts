@@ -16,7 +16,7 @@ export const getCalendarEvents = async (weekStartDate: string): Promise<Calendar
 }
 
 export const createRent = async (rentRequest: RentRequestDTO): Promise<RentEntity> => {
-  const res = await axios.post(`${API_BASE}/rent/complete`, rentRequest)
+  const res = await axios.post(`/receipt/calcAndSave`, rentRequest)
   return res.data
 }
 

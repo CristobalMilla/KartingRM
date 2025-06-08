@@ -34,12 +34,7 @@ public class RentController {
     @GetMapping("/{id}")
     public ResponseEntity<RentEntity> getRentById(@PathVariable int id) {
         RentEntity rent = rentService.getById(id);
-        if (rent == null) {
-            return ResponseEntity.notFound().build();
-        }
-        else {
-            return ResponseEntity.ok(rent);
-        }
+        return ResponseEntity.ok(rent);
     }
     //Save
     @PostMapping("/complete")
@@ -92,9 +87,6 @@ public class RentController {
             @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         List<RentEntity> rents = rentService.getRentsBetweenDates(startDate, endDate);
-        if (rents.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
         return ResponseEntity.ok(rents);
     }
     //Obtener el total de ventas de un mes
@@ -102,7 +94,25 @@ public class RentController {
     public ResponseEntity<BigDecimal> getTotalPriceForMonth(@RequestParam String month) {
         BigDecimal totalPrice = rentService.calculateTotalPriceForMonth(month);
         if (totalPrice == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(BigDecimal.ZERO);
+        }
+        return ResponseEntity.ok(totalPrice);
+    }
+    //Obtener el total de ventas de un mes segun un fee_type_id
+    @GetMapping("/totalPriceByFeeType")
+    public ResponseEntity<BigDecimal> getTotalPriceByFeeType(@RequestParam String month, @RequestParam int feeTypeId) {
+        BigDecimal totalPrice = rentService.calculateTotalPriceForMonthByFeeTypeId(month, feeTypeId);
+        if (totalPrice == null) {
+            return ResponseEntity.ok(BigDecimal.ZERO);
+        }
+        return ResponseEntity.ok(totalPrice);
+    }
+    //Obtener el total de ventas de un mes segun people_discount_id
+    @GetMapping("/totalPriceByPeopleDiscount")
+    public ResponseEntity<BigDecimal> getTotalPriceByPeopleDiscount(@RequestParam String month, @RequestParam int peopleDiscountId){
+        BigDecimal totalPrice = rentService.calculateTotalPriceForMonthByPeopleDiscountId(month, peopleDiscountId);
+        if (totalPrice == null) {
+            return ResponseEntity.ok(BigDecimal.ZERO);
         }
         return ResponseEntity.ok(totalPrice);
     }
@@ -110,9 +120,6 @@ public class RentController {
     @GetMapping("/getAvailableTimeSlots")
     public ResponseEntity<List<LocalTime>> getAvailableTimeSlots(@RequestParam LocalDate rentDate, @RequestParam int rentDuration) {
         List<LocalTime> availableSlots = rentService.getAvailableTimeSlots(rentDate, rentDuration);
-        if (availableSlots.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
         return ResponseEntity.ok(availableSlots);
     }
 }

@@ -12,6 +12,7 @@ import type {
 // Fee Types
 export const getAllFeeTypes = async (): Promise<FeeTypeEntity[]> => {
   const res = await axios.get('/feeType/all')
+  console.log('FeeType response:', res.data)
   return res.data
 }
 
@@ -40,11 +41,11 @@ export const getAllBirthdays = async (): Promise<BirthdayEntity[]> => {
 // Rents
 export const getAllRents = async (): Promise<RentEntity[]> => {
   const res = await axios.get('/rent/all')
-  return res.data
+  return Array.isArray(res.data) ? res.data : []
 }
 
 // Receipts
 export const getAllReceipts = async (): Promise<ReceiptEntity[]> => {
   const res = await axios.get('/receipt/all')
-  return res.data
+  return Array.isArray(res.data) ? res.data : []
 }

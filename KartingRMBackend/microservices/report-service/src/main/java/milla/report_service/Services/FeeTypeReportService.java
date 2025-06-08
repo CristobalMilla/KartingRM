@@ -56,7 +56,7 @@ public class FeeTypeReportService {
     //Funcion que, utilizando las anteriores, genera el la tabla reporte segun los tipos de tarifas
     public List<Map<String, Object>> generateFeeTypeReport(String startMonth, String endMonth) {
         // Fetch all fee types
-        Fee_Type[] feeTypes = restTemplate.getForObject("http://fee_type_service/feeTypes", Fee_Type[].class);
+        Fee_Type[] feeTypes = restTemplate.getForObject("http://FEE-TYPE-SERVICE/feeType/all", Fee_Type[].class);
         if(feeTypes == null){
             return null;
         }
@@ -80,7 +80,7 @@ public class FeeTypeReportService {
             for (String month : months) {
                 //Utilizando restTemplate, extraer todos los precios_finales de todas las rentas que se hayan hecho en ese mes, ya sumadas
                 BigDecimal monthTotal = restTemplate.getForObject(
-                        String.format("http://rent_service/rents/totalPriceByFeeType?month=%s&feeTypeId=%d",
+                        String.format("http://RENT-RECEIPT-SERVICE/rent/totalPriceByFeeType?month=%s&feeTypeId=%d",
                                 month, feeType.getFee_type_id()),
                         BigDecimal.class);
 

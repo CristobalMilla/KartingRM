@@ -48,32 +48,34 @@ export interface RentRequestDTO {
 
 // FrequencyDiscountEntity
 export interface FrequencyDiscountEntity {
-  id: number
-  description: string
+  frequency_discount_id: number
+  category: string
+  min_frequency: number
+  max_frequency: number
   discount: string // BigDecimal as string
-  minFrequency: number
+  
 }
 
 // PeopleDiscountEntity
 export interface PeopleDiscountEntity {
-  id: number
-  description: string
+  people_discount_id: number
+  min_people: number
+  max_people: number
   discount: string // BigDecimal as string
-  minPeople: number
 }
 
 // HolidayEntity
 export interface HolidayEntity {
-  id: number
+  holiday_id: number
   name: string
   date: string // ISO date string
-  specialFee: string // BigDecimal as string
+  discount: string // BigDecimal as string
 }
 
 // BirthdayEntity
 export interface BirthdayEntity {
-  id: number
-  clientName: string
+  birthday_id: number
+  name: string
   date: string // ISO date string
-  specialFee: string // BigDecimal as string
+  discount: string // BigDecimal as string
 }

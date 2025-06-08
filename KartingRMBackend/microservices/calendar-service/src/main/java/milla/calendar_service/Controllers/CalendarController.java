@@ -24,34 +24,19 @@ public class CalendarController {
     @GetMapping("/singleWeek")
     public ResponseEntity<List<Rent>> getRentsByWeek(@RequestParam LocalDate weekStartDate) {
         List<Rent> rents = calendarService.getRentsForWeek(weekStartDate);
-        if (rents == null) {
-            return ResponseEntity.notFound().build();
-        }
-        else {
-            return ResponseEntity.ok(rents);
-        }
+        return ResponseEntity.ok(rents);
     }
     //Funcion que convierte listas de rentas a listas de eventos, definidos en el DTO
     @GetMapping("/eventListByRentList")
     public ResponseEntity<List<CalendarEvent>> convertToCalendarEvents(@RequestParam List<Rent> rents){
         List<CalendarEvent> events = calendarService.convertToCalendarEvents(rents);
-        if (events == null) {
-            return ResponseEntity.notFound().build();
-        }
-        else {
-            return ResponseEntity.ok(events);
-        }
+        return ResponseEntity.ok(events);
     }
     //Funcion principal que, utilizando las anteriores, obtiene una lista de eventos, segun una fecha inicial y un numero de semanas a partir de esa fecha
     //Retorna en formato mapeado para las semanas, lo que se envia a frontend
     @GetMapping("/getEventsFromWeek")
     public ResponseEntity<Map<String, List<CalendarEvent>>> getCalendarEventsForWeeks(@RequestParam LocalDate startDate, @RequestParam int numberOfWeeks){
         Map<String, List<CalendarEvent>> weeklyEvents = calendarService.getCalendarEventsForWeeks(startDate, numberOfWeeks);
-        if (weeklyEvents == null) {
-            return ResponseEntity.notFound().build();
-        }
-        else {
-            return ResponseEntity.ok(weeklyEvents);
-        }
+        return ResponseEntity.ok(weeklyEvents);
     }
 }

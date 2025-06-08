@@ -18,18 +18,18 @@ const PeopleDiscount: React.FC = () => {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Descripción</th>
             <th>Descuento</th>
             <th>Mínimo de Personas</th>
+            <th>Máximo de Personas</th>
           </tr>
         </thead>
         <tbody>
           {discounts.map(d => (
-            <tr key={d.id}>
-              <td>{d.id}</td>
-              <td>{d.description}</td>
+            <tr key={d.people_discount_id}>
+              <td>{d.people_discount_id}</td>
               <td>{d.discount}</td>
-              <td>{d.minPeople}</td>
+              <td>{d.min_people}</td>
+              <td>{d.max_people}</td>
             </tr>
           ))}
         </tbody>

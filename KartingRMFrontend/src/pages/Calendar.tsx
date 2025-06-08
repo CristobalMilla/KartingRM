@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom'
 import { Calendar as BigCalendar, dateFnsLocalizer, Views } from 'react-big-calendar'
 import { format, parse, startOfWeek, getDay } from 'date-fns'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
+import { es as esLocale } from 'date-fns/locale'
 
 const locales = {
-  'es': require('date-fns/locale/es')
+  'es': esLocale
 }
 const localizer = dateFnsLocalizer({
   format,
@@ -26,17 +27,21 @@ const Calendar: React.FC = () => {
   const fetchEvents = async () => {
     setLoading(true)
     try {
-      // Only fetch 1 week for visual calendar
       const data = await getCalendarEventsForWeeks(startDate, 1)
-      // Flatten events for the week
-      const weekEvents = Object.values(data).flat() as CalendarEvent[]
-      // Map to react-big-calendar format
-      setEvents(weekEvents.map(ev => ({
-        title: ev.title,
-        start: new Date(ev.start),
-        end: new Date(ev.end),
-        resource: ev.client_name
-      })))
+      // If backend returns null, undefined, or not an object, fallback to empty
+      const weekEvents = data && typeof data === 'object' ? Object.values(data).flat() as CalendarEvent[] : []
+      setEvents(
+        weekEvents.map(ev => ({
+          title: ev.title,
+          start: new Date(ev.start),
+          end: new Date(ev.end),
+          resource: ev.client_name
+        }))
+      )
+    } catch (err) {
+      // On error, show no events and optionally alert the user
+      setEvents([])
+      // Optionally: alert('No se pudieron cargar los eventos del calendario.')
     } finally {
       setLoading(false)
     }
