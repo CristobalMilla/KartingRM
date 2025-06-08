@@ -91,11 +91,11 @@ services:
       - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
       - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8081/actuator/health || exit 1"]
+      test: ["CMD-SHELL", "wget --spider --quiet http://localhost:8081/actuator/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 60s
+      start_period: 90s
     networks:
       - karting-network
 
@@ -110,11 +110,11 @@ services:
       - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
       - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health || exit 1"]
+      test: ["CMD-SHELL", "wget --spider --quiet http://localhost:8761/actuator/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 60s
+      start_period: 90s
     depends_on:
       config-server-service:
         condition: service_healthy
@@ -132,11 +132,11 @@ services:
       - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
       - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8082/actuator/health || exit 1"]
+      test: ["CMD-SHELL", "wget --spider --quiet http://localhost:8082/actuator/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 60s
+      start_period: 90s
     depends_on:
       eureka-service:
         condition: service_healthy
@@ -162,12 +162,6 @@ services:
       - SERVER_PORT=0
       - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
       - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:$${SERVER_PORT:-8080}/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 90s
     depends_on:
       fee-type-postgres:
         condition: service_healthy
@@ -192,12 +186,6 @@ services:
       - SERVER_PORT=0
       - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
       - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:$${SERVER_PORT:-8080}/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 90s
     depends_on:
       frequency-postgres:
         condition: service_healthy
@@ -222,12 +210,6 @@ services:
       - SERVER_PORT=0
       - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
       - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:$${SERVER_PORT:-8080}/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 90s
     depends_on:
       people-postgres:
         condition: service_healthy
@@ -252,12 +234,6 @@ services:
       - SERVER_PORT=0
       - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
       - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:$${SERVER_PORT:-8080}/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 90s
     depends_on:
       special-day-postgres:
         condition: service_healthy
@@ -282,12 +258,6 @@ services:
       - SERVER_PORT=0
       - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
       - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:$${SERVER_PORT:-8080}/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 90s
     depends_on:
       rent-receipt-postgres:
         condition: service_healthy
@@ -310,12 +280,6 @@ services:
       - SERVER_PORT=0
       - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
       - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:$${SERVER_PORT:-8080}/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 90s
     depends_on:
       eureka-service:
         condition: service_healthy
@@ -333,12 +297,6 @@ services:
       - SERVER_PORT=0
       - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
       - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:$${SERVER_PORT:-8080}/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 90s
     depends_on:
       eureka-service:
         condition: service_healthy
