@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fee-type-postgres-deployment
+  namespace: backend
+  labels:
+    app: kartingrm
+    component: fee-type-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kartingrm
+      component: fee-type-postgres
+  template:
+    metadata:
+      labels:
+        app: kartingrm
+        component: fee-type-postgres
+    spec:
+      containers:
+      - name: fee-type-postgres
+        image: cristobalmilla/fee-type-db
+        imagePullPolicy: IfNotPresent # Use Always if images change frequently
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: KartingRMFeeType
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: backend-db-secrets # Refers to the Secret created above
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: backend-db-secrets
+              key: POSTGRES_PASSWORD
+        volumeMounts:
+        - name: postgres-data # Name of the volume
+          mountPath: /var/lib/postgresql/data # Path inside the container for DB data
+        livenessProbe: # Health check to ensure the container is running
+          exec:
+            command: ["pg_isready", "-U", "postgres"]
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+        readinessProbe: # Health check to ensure the container is ready to serve traffic
+          exec:
+            command: ["pg_isready", "-U", "postgres"]
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources: # Optional: Define resource requests and limits
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+      volumes:
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: fee-type-postgres-pvc # Link to the PVC

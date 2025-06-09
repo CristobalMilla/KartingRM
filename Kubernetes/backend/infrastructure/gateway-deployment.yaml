@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-service-deployment
+  namespace: backend
+  labels:
+    app: kartingrm
+    component: gateway-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kartingrm
+      component: gateway-service
+  template:
+    metadata:
+      labels:
+        app: kartingrm
+        component: gateway-service
+    spec:
+      containers:
+      - name: gateway-service
+        image: cristobalmilla/gateway-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8082 # Your Docker Compose specifies 8082
+        envFrom: # Pull most config from the backend-config ConfigMap
+        - configMapRef:
+            name: backend-config
+        # Override SERVER_PORT specifically for gateway from ConfigMap
+        env:
+        - name: SERVER_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: backend-config
+              key: GATEWAY_PORT # Using the specific GATEWAY_PORT key from ConfigMap
+        command: ["java", "-jar", "app.jar", "--eureka.client.serviceUrl.defaultZone=http://eureka-service.backend.svc.cluster.local:8761/eureka/"]
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8082
+          initialDelaySeconds: 120 # Gateway needs Eureka and Config Server to be ready
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8082
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 300m
+            memory: 1Gi
+          limits:
+            cpu: 1000m
+            memory: 2Gi

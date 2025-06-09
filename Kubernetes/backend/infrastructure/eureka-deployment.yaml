@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eureka-service-deployment
+  namespace: backend
+  labels:
+    app: kartingrm
+    component: eureka-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kartingrm
+      component: eureka-service
+  template:
+    metadata:
+      labels:
+        app: kartingrm
+        component: eureka-service
+    spec:
+      containers:
+      - name: eureka-service
+        image: cristobalmilla/eureka-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8761
+        envFrom: # Use envFrom to pull all data from ConfigMap
+        - configMapRef:
+            name: backend-config # Refers to the ConfigMap created earlier
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8761
+          initialDelaySeconds: 90 # Give it time to start up and connect to Config Server
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8761
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 250m
+            memory: 768Mi
+          limits:
+            cpu: 750m
+            memory: 1.5Gi

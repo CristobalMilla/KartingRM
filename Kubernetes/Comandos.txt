@@ -5,12 +5,20 @@ minikube ip
 minikube start --driver=docker
 minikube status
 
+kubectl get deployments
+kubectl get services
+kubectl get pods -o wide
+kubectl get nodes -o wide
+
+kubectl get secret
+kubectl get configmap
+kubectl get pvc
+
 cd C:\Users\crist\Documents\Proyectos\Lab2Tingeso\KartingRM
 
 ---NAMESPACES---
-
-kubectl apply -f ./Kubernetes/common/backend-namespace.yaml
-kubectl apply -f ./Kubernetes/common/frontend-namespace.yaml
+kubectl apply -f ./Kubernetes/namespaces/frontend-namespace.yaml
+kubectl apply -f ./Kubernetes/namespaces/backend-namespace.yaml
 
 ---GETTERS---
 
@@ -29,59 +37,66 @@ kubectl get nodes -o wide -n frontend
 kubectl get secret -n backend
 kubectl get secret -n frontend
 
----CONFIG MAP
-kubectl get configmap
+---CONFIG MAP---
 
-kubectl apply -f ./Kubernetes/common/shared-configmap.yaml
+kubectl apply -f ./Kubernetes/backend/config/backend-configmap.yaml
+kubectl apply -f ./Kubernetes/backend/config/backend-secret.yaml
 
----DEPLOYMENTS, SERVICES, DB-SECRET---
---Fee-Type---
-kubectl apply -f ./Kubernetes/backend/fee-type-deployment.yaml
-kubectl apply -f ./Kubernetes/backend/fee-type-service.yaml
-kubectl apply -f ./Kubernetes/backend/fee-type-db-secret.yaml
---Frequency-Discount---
-kubectl apply -f ./Kubernetes/backend/frequency-discount-deployment.yaml
-kubectl apply -f ./Kubernetes/backend/frequency-discount-service.yaml
-kubectl apply -f ./Kubernetes/backend/frequency-discount-db-secret.yaml
---People-Discount---
-kubectl apply -f ./Kubernetes/backend/people-discount-deployment.yaml
-kubectl apply -f ./Kubernetes/backend/people-discount-service.yaml
-kubectl apply -f ./Kubernetes/backend/people-discount-db-secret.yaml
---Special-Day-Fee---
-kubectl apply -f ./Kubernetes/backend/special-day-fee-deployment.yaml
-kubectl apply -f ./Kubernetes/backend/special-day-fee-service.yaml
-kubectl apply -f ./Kubernetes/backend/special-day-fee-db-secret.yaml
---Rent-Receipt---
-kubectl apply -f ./Kubernetes/backend/rent-receipt-deployment.yaml
-kubectl apply -f ./Kubernetes/backend/rent-receipt-service.yaml
-kubectl apply -f ./Kubernetes/backend/rent-receipt-db-secret.yaml
---Calendar---
-kubectl apply -f ./Kubernetes/backend/calendar-deployment.yaml
-kubectl apply -f ./Kubernetes/backend/calendar-service.yaml
---Report---
-kubectl apply -f ./Kubernetes/backend/report-deployment.yaml
-kubectl apply -f ./Kubernetes/backend/report-service.yaml
---Config-Server---
-kubectl apply -f ./Kubernetes/backend/config-server-deployment.yaml
-kubectl apply -f ./Kubernetes/backend/config-server-service.yaml
---Eureka---
-kubectl apply -f ./Kubernetes/backend/eureka-deployment.yaml
-kubectl apply -f ./Kubernetes/backend/eureka-service.yaml
---Gateway---
-kubectl apply -f ./Kubernetes/backend/gateway-deployment.yaml
-kubectl apply -f ./Kubernetes/backend/gateway-service.yaml
+---DATABASES---
+kubectl apply -f ./Kubernetes/backend/databases/fee-type-postgres-pvc.yaml
+kubectl apply -f ./Kubernetes/backend/databases/fee-type-postgres-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/databases/fee-type-postgres-service.yaml
 
---Frontend--
-kubectl apply -f ./Kubernetes/frontend/frontend-deployment.yaml
-kubectl apply -f ./Kubernetes/frontend/frontend-service.yaml
+kubectl apply -f ./Kubernetes/backend/databases/frequency-postgres-pvc.yaml
+kubectl apply -f ./Kubernetes/backend/databases/frequency-postgres-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/databases/frequency-postgres-service.yaml
 
----VERIFICAR---
-kubectl get pods -n backend
-kubectl get pods -n frontend
-kubectl get svc -n backend
-kubectl get svc -n frontend
+kubectl apply -f ./Kubernetes/backend/databases/people-postgres-pvc.yaml
+kubectl apply -f ./Kubernetes/backend/databases/people-postgres-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/databases/people-postgres-service.yaml
 
-minikube ip
+kubectl apply -f ./Kubernetes/backend/databases/special-day-postgres-pvc.yaml
+kubectl apply -f ./Kubernetes/backend/databases/special-day-postgres-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/databases/special-day-postgres-service.yaml
+
+kubectl apply -f ./Kubernetes/backend/databases/rent-receipt-postgres-pvc.yaml
+kubectl apply -f ./Kubernetes/backend/databases/rent-receipt-postgres-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/databases/rent-receipt-postgres-service.yaml
 
 
+---INFRASTUCTURE---
+kubectl apply -f ./Kubernetes/backend/infrastructure/config-server-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/infrastructure/config-server-service.yaml
 
+kubectl apply -f ./Kubernetes/backend/infrastructure/eureka-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/infrastructure/eureka-service.yaml
+
+kubectl apply -f ./Kubernetes/backend/infrastructure/gateway-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/infrastructure/gateway-service.yaml
+
+
+---MICROSERVICES---
+kubectl apply -f ./Kubernetes/backend/microservices/fee-type-service-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/microservices/fee-type-service-service.yaml
+
+kubectl apply -f ./Kubernetes/backend/microservices/frequency-discount-service-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/microservices/frequency-discount-service-service.yaml
+
+kubectl apply -f ./Kubernetes/backend/microservices/people-discount-service-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/microservices/people-discount-service-service.yaml
+
+kubectl apply -f ./Kubernetes/backend/microservices/special-day-fee-service-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/microservices/special-day-fee-service-service.yaml
+
+kubectl apply -f ./Kubernetes/backend/microservices/rent-receipt-service-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/microservices/rent-receipt-service-service.yaml
+
+kubectl apply -f ./Kubernetes/backend/microservices/calendar-service-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/microservices/calendar-service-service.yaml
+
+kubectl apply -f ./Kubernetes/backend/microservices/report-service-deployment.yaml
+kubectl apply -f ./Kubernetes/backend/microservices/report-service-service.yaml
+
+---FRONTEND---
+kubectl apply -f ./Kubernetes/frontend/kartingrm-frontend-deployment.yaml
+kubectl apply -f ./Kubernetes/frontend/kartingrm-frontend-service.yaml

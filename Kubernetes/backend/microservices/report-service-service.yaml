@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: report-service # DNS name for other microservices
+  namespace: backend
+  labels:
+    app: kartingrm
+    component: report-service
+spec:
+  selector:
+    app: kartingrm
+    component: report-service
+  ports:
+    - protocol: TCP
+      port: 8080       # This is the service port
+      targetPort: 8080 # This is the container port
+  type: ClusterIP      # Internal service

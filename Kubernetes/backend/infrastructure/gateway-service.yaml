@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service # This will be the DNS name for your Gateway
+  namespace: backend
+  labels:
+    app: kartingrm
+    component: gateway-service
+spec:
+  selector:
+    app: kartingrm
+    component: gateway-service
+  ports:
+    - protocol: TCP
+      port: 8082       # Port the service exposes internally
+      targetPort: 8082 # Port the container is listening on
+      nodePort: 30444  # Chosen NodePort for the Gateway
+  type: NodePort       # Changed to NodePort for external access

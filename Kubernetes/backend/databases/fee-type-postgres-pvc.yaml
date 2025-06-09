@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fee-type-postgres-pvc
+  namespace: backend
+spec:
+  accessModes:
+    - ReadWriteOnce # This PVC can be mounted as read-write by a single node
+  resources:
+    requests:
+      storage: 1Gi # Request 1 Gigabyte of storage
+  # storageClassName: standard # Minikube's default storage class (usually 'standard' or 'hostpath')

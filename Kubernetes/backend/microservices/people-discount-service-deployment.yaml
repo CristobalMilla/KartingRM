@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: people-discount-service-deployment
+  namespace: backend
+  labels:
+    app: kartingrm
+    component: people-discount-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kartingrm
+      component: people-discount-service
+  template:
+    metadata:
+      labels:
+        app: kartingrm
+        component: people-discount-service
+    spec:
+      containers:
+      - name: people-discount-service
+        image: cristobalmilla/people-discount-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080 # Assuming it exposes 8080 if SERVER_PORT=0
+        envFrom: # Pull common config from backend-config ConfigMap
+        - configMapRef:
+            name: backend-config
+        env: # Database-specific environment variables
+        - name: DB_HOST
+          value: people-postgres-service.backend.svc.cluster.local # Connects to the people-postgres database service
+        - name: DB_PORT
+          value: "5432" # Standard PostgreSQL port
+        - name: DB_NAME
+          value: KartingRMPeople # Matches the database name in the people-postgres deployment
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: backend-db-secrets
+              key: POSTGRES_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: backend-db-secrets
+              key: POSTGRES_PASSWORD
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 90 # Give it time to start up and connect to DB/Eureka/Config Server
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 250m
+            memory: 768Mi
+          limits:
+            cpu: 750m
+            memory: 1.5Gi

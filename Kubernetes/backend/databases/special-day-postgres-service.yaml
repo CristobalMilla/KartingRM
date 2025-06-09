@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: special-day-postgres-service # This will be the DNS name for your service
+  namespace: backend
+  labels:
+    app: kartingrm
+    component: special-day-postgres
+spec:
+  selector:
+    app: kartingrm
+    component: special-day-postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP

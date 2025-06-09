@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calendar-service-deployment
+  namespace: backend
+  labels:
+    app: kartingrm
+    component: calendar-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kartingrm
+      component: calendar-service
+  template:
+    metadata:
+      labels:
+        app: kartingrm
+        component: calendar-service
+    spec:
+      containers:
+      - name: calendar-service
+        image: cristobalmilla/calendar-service:latest
+        imagePullPolicy: IfNotPresent
+        envFrom: # Pull common config from backend-config ConfigMap
+        - configMapRef:
+            name: backend-config
+        # Note: No database-specific environment variables are needed here
+        ports:
+        - containerPort: 8080 # Assuming it exposes 8080 if SERVER_PORT=0
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 150m
+            memory: 300Mi
+          limits:
+            cpu: 400m
+            memory: 700Mi

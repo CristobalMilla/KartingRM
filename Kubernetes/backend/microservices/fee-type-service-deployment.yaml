@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fee-type-service-deployment
+  namespace: backend
+  labels:
+    app: kartingrm
+    component: fee-type-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kartingrm
+      component: fee-type-service
+  template:
+    metadata:
+      labels:
+        app: kartingrm
+        component: fee-type-service
+    spec:
+      containers:
+      - name: fee-type-service
+        image: cristobalmilla/fee-type-service:latest
+        imagePullPolicy: IfNotPresent
+        env:
+          # Database connection details
+          - name: DB_HOST
+            value: fee-type-postgres-service.backend.svc.cluster.local # Connects to the database service
+          - name: DB_PORT
+            value: "5432"
+          - name: DB_NAME
+            value: KartingRMFeeType
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: backend-db-secrets
+                key: POSTGRES_USER
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: backend-db-secrets
+                key: POSTGRES_PASSWORD
+          # General application config from ConfigMap
+          - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+            valueFrom:
+              configMapKeyRef:
+                name: backend-config
+                key: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+          - name: SPRING_CLOUD_CONFIG_URI
+            valueFrom:
+              configMapKeyRef:
+                name: backend-config
+                key: SPRING_CLOUD_CONFIG_URI
+          - name: SERVER_PORT
+            valueFrom: # Use the SERVER_PORT_ZERO from config map to assign dynamic port
+              configMapKeyRef:
+                name: backend-config
+                key: SERVER_PORT_ZERO
+          - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+            valueFrom:
+              configMapKeyRef:
+                name: backend-config
+                key: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
+          - name: MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS
+            valueFrom:
+              configMapKeyRef:
+                name: backend-config
+                key: MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS
+        ports:
+        - containerPort: 8080 # Spring Boot services often use 8080 by default if SERVER_PORT=0
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080 # Assuming it exposes 8080 if SERVER_PORT=0
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 150m
+            memory: 300Mi
+          limits:
+            cpu: 400m
+            memory: 700Mi

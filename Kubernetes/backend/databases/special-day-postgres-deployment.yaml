@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: special-day-postgres-deployment
+  namespace: backend
+  labels:
+    app: kartingrm
+    component: special-day-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kartingrm
+      component: special-day-postgres
+  template:
+    metadata:
+      labels:
+        app: kartingrm
+        component: special-day-postgres
+    spec:
+      containers:
+      - name: special-day-postgres
+        image: cristobalmilla/special-day-db # Updated image
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: KartingRMSpecialDay # Updated database name
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: backend-db-secrets
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: backend-db-secrets
+              key: POSTGRES_PASSWORD
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+        livenessProbe:
+          exec:
+            command: ["pg_isready", "-U", "postgres"]
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+        readinessProbe:
+          exec:
+            command: ["pg_isready", "-U", "postgres"]
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+      volumes:
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: special-day-postgres-pvc # Link to the PVC

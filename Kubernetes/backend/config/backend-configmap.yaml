@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: backend
+data:
+  EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service.backend.svc.cluster.local:8761/eureka/
+  SPRING_CLOUD_CONFIG_URI: http://config-server-service.backend.svc.cluster.local:8081
+  MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info,metrics,env
+  MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: always
+  MANAGEMENT_ENDPOINT_ENV_SHOW_VALUES: always # From gateway
+  SERVER_PORT_ZERO: "0" # For Spring Boot apps to pick a dynamic port
+  GATEWAY_PORT: "8082" # Specific port for gateway

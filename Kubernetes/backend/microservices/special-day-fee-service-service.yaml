@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: special-day-fee-service # DNS name for other microservices and Gateway
+  namespace: backend
+  labels:
+    app: kartingrm
+    component: special-day-fee-service
+spec:
+  selector:
+    app: kartingrm
+    component: special-day-fee-service
+  ports:
+    - protocol: TCP
+      port: 8080       # This is the service port
+      targetPort: 8080 # This is the container port
+  type: ClusterIP      # Internal service

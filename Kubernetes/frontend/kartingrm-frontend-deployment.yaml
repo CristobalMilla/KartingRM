@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kartingrm-frontend-deployment
+  namespace: frontend # This belongs to the frontend namespace
+  labels:
+    app: kartingrm
+    component: karting-rm-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kartingrm
+      component: karting-rm-frontend
+  template:
+    metadata:
+      labels:
+        app: kartingrm
+        component: karting-rm-frontend
+    spec:
+      containers:
+      - name: kartingrm-frontend
+        image: cristobalmilla/kartingrm-frontend:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80 # Assuming your frontend listens on port 80 (common for web servers)
+        env:
+        - name: REACT_APP_API_BASE_URL # This variable name comes from your docker-compose
+          value: "http://192.168.49.2:30444" # REEMPLAZAR IP POR RETORNO DE minikube ip
+        livenessProbe:
+          httpGet:
+            path: / # Or a specific health check endpoint if your frontend has one
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits:
+            cpu: 300m
+            memory: 500Mi
