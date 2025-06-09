@@ -16,10 +16,6 @@ kubectl get pvc
 
 cd C:\Users\crist\Documents\Proyectos\Lab2Tingeso\KartingRM
 
----NAMESPACES---
-kubectl apply -f ./Kubernetes/namespaces/frontend-namespace.yaml
-kubectl apply -f ./Kubernetes/namespaces/backend-namespace.yaml
-
 ---GETTERS---
 
 kubectl get deployments -n backend
@@ -35,7 +31,24 @@ kubectl get nodes -o wide -n backend
 kubectl get nodes -o wide -n frontend
 
 kubectl get secret -n backend
-kubectl get secret -n frontend
+kubectl get configmap -n backend
+
+kubectl get pods -A
+kubectl get svc -A
+
+---COMANDOS GENERALES---
+kubectl apply -f ./Kubernetes/namespaces/backend-namespace.yaml
+kubectl apply -f ./Kubernetes/namespaces/frontend-namespace.yaml
+kubectl apply -f ./Kubernetes/backend/config/backend-configmap.yaml
+kubectl apply -f ./Kubernetes/backend/config/backend-secret.yaml
+kubectl apply -f ./Kubernetes/backend/infrastructure/
+kubectl apply -f ./Kubernetes/backend/databases/
+kubectl apply -f ./Kubernetes/backend/microservices/
+kubectl apply -f ./Kubernetes/frontend/
+
+---NAMESPACES---
+kubectl apply -f ./Kubernetes/namespaces/frontend-namespace.yaml
+kubectl apply -f ./Kubernetes/namespaces/backend-namespace.yaml
 
 ---CONFIG MAP---
 

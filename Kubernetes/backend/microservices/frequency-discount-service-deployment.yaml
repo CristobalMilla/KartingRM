@@ -44,6 +44,8 @@ spec:
             secretKeyRef:
               name: backend-db-secrets
               key: POSTGRES_PASSWORD
+        - name: SERVER_PORT # Add or modify this line
+          value: "8080"
         livenessProbe:
           httpGet:
             path: /actuator/health
