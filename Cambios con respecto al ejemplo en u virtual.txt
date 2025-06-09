@@ -1,2 +1,3 @@
 @RestController en vez de @Controller
 @EnableDiscoveryClient En main, para eureka
+Namespaces

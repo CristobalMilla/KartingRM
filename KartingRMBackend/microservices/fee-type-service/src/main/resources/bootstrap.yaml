@@ -10,7 +10,7 @@ spring:
     active: default
   # Fallback configuration in case Config Server is not available
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:KartingRMFeeType}  # ← FIXED: Use DB_NAME
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:KartingRMFeeType}
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgre}
     driver-class-name: org.postgresql.Driver
@@ -24,12 +24,12 @@ spring:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://${EUREKA_HOST:eureka-service}:${EUREKA_PORT:8761}/eureka/  # ← FIXED: Default to service name
+      defaultZone: http://${EUREKA_HOST:eureka-service}:${EUREKA_PORT:8761}/eureka/
   instance:
     preferIpAddress: true
 
 server:
-  port: ${PORT:0} # ← FIXED: Dynamic port assignment
+  port: ${PORT:0}
 
 # Add actuator configuration
 management:

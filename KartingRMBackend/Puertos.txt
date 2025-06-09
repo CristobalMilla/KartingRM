@@ -1,11 +1,3 @@
 Eureka: 8761
 Config server: 8081
 Gateway: 8082
-
-FeeType: 8083
-Frequency: 8084
-People: 8085
-SpecialDay: 8086
-RentReceipt: 8087
-Calendar: 8088
-Report: 8089

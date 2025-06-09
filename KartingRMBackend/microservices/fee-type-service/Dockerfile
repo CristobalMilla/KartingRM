@@ -1,20 +1,16 @@
-# Use OpenJDK 17 JRE Alpine version
+# Usando OpenJDK 17 JRE Alpine
 FROM eclipse-temurin:17-jre-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Copy the Maven project file
 COPY ./pom.xml ./pom.xml
 
-# Copy the src directory
 COPY ./src ./src
 
-# Copy the pre-packaged JAR file
+# Copiar el JAR pre packaged, se necesita correr mvn clean package antes
 COPY ./target/*.jar app.jar
 
-# Expose a default port (optional, for reference; dynamic ports are handled at runtime)
+# Expose default port (Opcional, cambia a dinamico en runtime)
 EXPOSE 8080
 
-# Command to run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
